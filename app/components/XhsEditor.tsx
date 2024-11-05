@@ -349,19 +349,17 @@ const XhsEditor = () => {
               <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
                 <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
                 <div className="space-y-4">
-                  {/* 只在非 AI 模式下显示标题输入 */}
-                  {editorState.template !== 'ai' && (
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-2">标题</label>
-                      <input
-                        type="text"
-                        value={editorState.title}
-                        onChange={e => setEditorState(prev => ({ ...prev, title: e.target.value }))}
-                        placeholder="输入标题"
-                        className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                      />
-                    </div>
-                  )}
+                  {/* 移除条件判断，始终显示标题输入 */}
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2">标题</label>
+                    <input
+                      type="text"
+                      value={editorState.title}
+                      onChange={e => setEditorState(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="输入标题"
+                      className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    />
+                  </div>
 
                   {editorState.template === 'knowledge' && (
                     <div className="space-y-4" ref={contentEditRef}>
@@ -436,6 +434,7 @@ const XhsEditor = () => {
 
                   {editorState.template === 'ai' && (
                     <AIContentEditor
+                      title={editorState.title}
                       onContentGenerated={(content) => {
                         const newSections = [
                           {
@@ -460,6 +459,8 @@ const XhsEditor = () => {
                   {editorState.template === 'thinking' && <ThinkingCard />}
                   {editorState.template === 'ai' && (
                     <MarkdownCard
+                      ref={cardRef}
+                      title={editorState.title}
                       content={editorState.sections[0]?.content || ''}
                       font={getFontStyle(editorState.font).fontFamily}
                       fontSize={editorState.fontSize}
