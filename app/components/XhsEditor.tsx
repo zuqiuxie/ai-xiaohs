@@ -15,13 +15,14 @@ const XhsEditor = () => {
   const [editorState, setEditorState] = useState<EditorState>({
     template: 'knowledge',
     title: '',
-    font: '楷体',
+    font: '思源黑体',
     fontSize: '16px',
     backgroundColor: '#E6F7F3',
     sections: [{ ...defaultSection }],
   });
 
   const cardRef = useRef<HTMLDivElement>(null);
+  const contentEditRef = useRef<HTMLDivElement>(null);
 
   const handleTemplateChange = (template: TemplateType) => {
     setEditorState(prev => ({
@@ -36,6 +37,15 @@ const XhsEditor = () => {
       ...prev,
       sections: [...prev.sections, { ...defaultSection, id: uuidv4() }],
     }));
+
+    setTimeout(() => {
+      if (contentEditRef.current) {
+        const newSectionElement = contentEditRef.current.lastElementChild;
+        if (newSectionElement) {
+          newSectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }, 100);
   };
 
   const handleRemoveSection = (id: string) => {
@@ -90,9 +100,12 @@ const XhsEditor = () => {
   const getFontStyle = (font: string) => {
     // 中文字体名称映射
     const fontMap: Record<string, string> = {
-      楷体: 'KaiTi, 楷体, STKaiti',
-      宋体: 'SimSun, 宋体',
-      黑体: 'SimHei, 黑体',
+      '思源黑体': '"Source Han Sans SC", "Noto Sans SC", sans-serif',
+      '思源宋体': '"Source Han Serif SC", "Noto Serif SC", serif',
+      '霞鹜文楷': '"LXGW WenKai", serif',
+      '楷体': 'KaiTi, STKaiti, serif',
+      '宋体': 'SimSun, serif',
+      '黑体': 'SimHei, sans-serif',
     };
 
     return {
@@ -225,11 +238,11 @@ const XhsEditor = () => {
             </div>
           </div>
 
-          <div className="flex gap-8">
-            {/* 左侧编辑区 - 调整高度和滚动 */}
-            <div className="flex-1 max-w-2xl">
-              {/* 样式设置区 - 减小内边距 */}
-              <div className="bg-white/60 rounded-lg p-3 mb-3">
+          <div className="flex gap-8 h-[calc(100vh-220px)]">
+            {/* 左侧编辑区 - 添加固定高度和滚动控制 */}
+            <div className="flex-1 max-w-2xl flex flex-col">
+              {/* 样式设置区 - 设为 flex-shrink-0 防止压缩 */}
+              <div className="bg-white/60 rounded-lg p-3 mb-3 flex-shrink-0">
                 <h3 className="text-xs font-medium text-gray-900 mb-2">样式设置</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-4">
@@ -239,6 +252,9 @@ const XhsEditor = () => {
                         value={editorState.font}
                         onChange={e => setEditorState(prev => ({ ...prev, font: e.target.value }))}
                         className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
+                        <option value="思源黑体">思源黑体</option>
+                        <option value="思源宋体">思源宋体</option>
+                        <option value="霞鹜文楷">霞鹜文楷</option>
                         <option value="楷体">楷体</option>
                         <option value="宋体">宋体</option>
                         <option value="黑体">黑体</option>
@@ -287,8 +303,8 @@ const XhsEditor = () => {
                 </div>
               </div>
 
-              {/* 内容编辑区 - 减小内边距 */}
-              <div className="bg-white/60 rounded-lg p-3">
+              {/* 内容编辑区 - 添加 flex-1 和 overflow-auto */}
+              <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
                 <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
                 <div className="space-y-4">
                   <div>
@@ -303,7 +319,7 @@ const XhsEditor = () => {
                   </div>
 
                   {editorState.template === 'knowledge' ? (
-                    <div className="space-y-4">
+                    <div className="space-y-4" ref={contentEditRef}>
                       {editorState.sections.map((section, index) => (
                         <div key={section.id} className="bg-white rounded-lg p-4 shadow-sm">
                           <div className="flex items-center gap-3 mb-3">
@@ -374,8 +390,8 @@ const XhsEditor = () => {
               </div>
             </div>
 
-            {/* 右侧预览区 - 调整位置固定 */}
-            <div className="w-[380px] flex-shrink-0 sticky top-6">
+            {/* 右侧预览区 - 保持不变 */}
+            <div className="w-[380px] flex-shrink-0">
               <div className="flex flex-col items-start space-y-3">
                 <div className="relative group">
                   {editorState.template === 'knowledge' ? <KnowledgeCard /> : <ThinkingCard />}
