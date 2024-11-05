@@ -129,7 +129,7 @@ const XhsEditor = () => {
             fontFamily: getFontStyle(editorState.font).fontFamily,
             fontSize: parseInt(editorState.fontSize) + 2 + 'px',
           }}>
-          {editorState.title || '什么是提示工程'}
+          {editorState.title || '标题'}
         </h1>
         <div className="space-y-4">
           {editorState.sections.map((section, index) => (
@@ -174,12 +174,12 @@ const XhsEditor = () => {
       }}>
       <div className="p-6 h-full">
         <h1
-          className="text-lg font-bold mb-6"
+          className="text-lg font-bold mb-6 text-center"
           style={{
             fontFamily: getFontStyle(editorState.font).fontFamily,
             fontSize: parseInt(editorState.fontSize) + 2 + 'px',
           }}>
-          {editorState.title || '个人思考'}
+          {editorState.title || '标题'}
         </h1>
         <div
           className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm"
@@ -266,9 +266,12 @@ const XhsEditor = () => {
                         value={editorState.fontSize}
                         onChange={e => setEditorState(prev => ({ ...prev, fontSize: e.target.value }))}
                         className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
-                        <option value="14px">14px</option>
-                        <option value="16px">16px</option>
-                        <option value="18px">18px</option>
+                        <option value="12px">12px - 小号</option>
+                        <option value="14px">14px - 正常</option>
+                        <option value="15px">15px - 中等</option>
+                        <option value="16px">16px - 偏大</option>
+                        <option value="18px">18px - 大号</option>
+                        <option value="20px">20px - 特大</option>
                       </select>
                     </div>
                   </div>
@@ -277,23 +280,29 @@ const XhsEditor = () => {
                     <label className="block text-xs text-gray-500 mb-1">背景色</label>
                     <div className="flex flex-wrap gap-2">
                       {[
-                        { color: '#E6F7F3', name: '清新绿' },
-                        { color: '#F3E6FF', name: '淡紫色' },
-                        { color: '#FFF3E6', name: '暖橙色' },
-                        { color: '#E6F0FF', name: '天蓝色' },
-                        { color: '#FFE6E6', name: '浅粉色' },
-                        { color: '#F5F5F5', name: '浅灰色' },
+                        { color: '#E6F7F3', name: '薄荷绿' },
+                        { color: '#F3E6FF', name: '梦幻紫' },
+                        { color: '#FFF3E6', name: '暖阳橙' },
+                        { color: '#E6F0FF', name: '天空蓝' },
+                        { color: '#FFE6E6', name: '樱花粉' },
+                        { color: '#F5F5F5', name: '简约灰' },
+                        { color: '#E8F4D9', name: '清新绿' },
+                        { color: '#FCE6E6', name: '珊瑚红' },
+                        { color: '#E6ECF4', name: '深海蓝' },
+                        { color: '#F9E9F9', name: '浪漫紫' },
+                        { color: '#FFF0E1', name: '奶茶棕' },
+                        { color: '#EDF3F7', name: '云雾蓝' },
                       ].map(({ color, name }) => (
                         <button
                           key={color}
-                          className={`group relative w-6 h-6 rounded-full transition-all duration-300 ${
+                          className={`group relative w-7 h-7 rounded-full transition-all duration-300 ${
                             editorState.backgroundColor === color
-                              ? 'ring-2 ring-offset-1 ring-blue-500/30 scale-110'
+                              ? 'ring-2 ring-offset-2 ring-blue-500/30 scale-110'
                               : 'hover:scale-110'
                           }`}
                           style={{ backgroundColor: color }}
                           onClick={() => setEditorState(prev => ({ ...prev, backgroundColor: color }))}>
-                          <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                          <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             {name}
                           </span>
                         </button>
@@ -349,7 +358,7 @@ const XhsEditor = () => {
                               newSections[index].content = e.target.value;
                               setEditorState(prev => ({ ...prev, sections: newSections }));
                             }}
-                            placeholder="输入内容"
+                            placeholder="请输入内容"
                             className="w-full px-3 py-2 bg-gray-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[100px] resize-none"
                           />
                         </div>
@@ -376,7 +385,7 @@ const XhsEditor = () => {
                           ];
                           setEditorState(prev => ({ ...prev, sections: newSections }));
                         }}
-                        placeholder="输入你的思考内容..."
+                        placeholder="请输入内容..."
                         className="w-full px-3 py-2 bg-gray-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[300px] resize-none"
                         style={{
                           fontFamily: editorState.font,
