@@ -60,31 +60,54 @@ const XhsEditor = () => {
     if (!cardRef.current) return;
 
     try {
-      // 临时移除滚动样式
-      const originalStyle = cardRef.current.style.overflow;
-      cardRef.current.style.overflow = 'visible';
-      cardRef.current.style.height = 'auto';
+      const previewElement = cardRef.current;
+      const { width } = previewElement.getBoundingClientRect();
 
-      const canvas = await html2canvas(cardRef.current, {
+      // 保存原始样式
+      const originalStyles = {
+        width: previewElement.style.width,
+        height: previewElement.style.height,
+        overflow: previewElement.style.overflow,
+        position: previewElement.style.position,
+      };
+
+      // 临时修改样式以捕获完整内容
+      previewElement.style.width = `${width}px`;
+      previewElement.style.height = 'auto';  // 让高度自适应内容
+      previewElement.style.overflow = 'visible';
+      previewElement.style.position = 'relative';
+
+      // 获取实际内容高度
+      const contentHeight = previewElement.scrollHeight;
+      // 确保最小高度为宽度的4/3，保持比例
+      const minHeight = (width * 4) / 3;
+      const exportHeight = Math.max(contentHeight, minHeight);
+
+      // 设置最终导出尺寸
+      previewElement.style.height = `${exportHeight}px`;
+
+      const canvas = await html2canvas(previewElement, {
         scale: 2, // 提高清晰度
         backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
         logging: false,
-        windowWidth: 720, // 设置更大的宽度以确保质量
-        windowHeight: 960,
-        useCORS: true, // 允许跨域图片
+        width: width,
+        height: exportHeight,
+        windowWidth: width,
+        windowHeight: exportHeight,
+        useCORS: true,
         onclone: clonedDoc => {
-          // 在克隆的文档中也应用相同的样式
           const clonedElement = clonedDoc.querySelector('[data-card]');
-          if (clonedElement) {
-            (clonedElement as HTMLElement).style.overflow = 'visible';
-            (clonedElement as HTMLElement).style.height = 'auto';
+          if (clonedElement instanceof HTMLElement) {
+            clonedElement.style.width = `${width}px`;
+            clonedElement.style.height = `${exportHeight}px`;
+            clonedElement.style.overflow = 'visible';
+            clonedElement.style.position = 'relative';
           }
         },
       });
 
-      // 恢复原始滚动样式
-      cardRef.current.style.overflow = originalStyle;
-      cardRef.current.style.height = '480px';
+      // 恢复原始样式
+      Object.assign(previewElement.style, originalStyles);
 
       // 创建下载链接
       const link = document.createElement('a');
@@ -100,12 +123,12 @@ const XhsEditor = () => {
   const getFontStyle = (font: string) => {
     // 中文字体名称映射
     const fontMap: Record<string, string> = {
-      '思源黑体': '"Source Han Sans SC", "Noto Sans SC", sans-serif',
-      '思源宋体': '"Source Han Serif SC", "Noto Serif SC", serif',
-      '霞鹜文楷': '"LXGW WenKai", serif',
-      '楷体': 'KaiTi, STKaiti, serif',
-      '宋体': 'SimSun, serif',
-      '黑体': 'SimHei, sans-serif',
+      思源黑体: '"Source Han Sans SC", "Noto Sans SC", sans-serif',
+      思源宋体: '"Source Han Serif SC", "Noto Serif SC", serif',
+      霞鹜文楷: '"LXGW WenKai", serif',
+      楷体: 'KaiTi, STKaiti, serif',
+      宋体: 'SimSun, serif',
+      黑体: 'SimHei, sans-serif',
     };
 
     return {
@@ -122,7 +145,7 @@ const XhsEditor = () => {
       style={{
         backgroundColor: editorState.backgroundColor,
       }}>
-      <div className="p-6">
+      <div className="p-6 h-full">
         <h1
           className="text-xl font-medium mb-6 text-center tracking-tight"
           style={{
@@ -137,19 +160,16 @@ const XhsEditor = () => {
               key={section.id}
               className="rounded-xl p-4 transition-all duration-200"
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-0.5 h-4 bg-red-500 rounded-full"></div>
-                <h2
-                  className="text-base font-medium tracking-tight"
-                  style={{
-                    fontFamily: getFontStyle(editorState.font).fontFamily,
-                    fontSize: editorState.fontSize,
-                  }}>
-                  {section.title || `小节 ${index + 1}`}
-                </h2>
-              </div>
+              <h2
+                className="text-base font-medium tracking-tight mb-2"
+                style={{
+                  fontFamily: getFontStyle(editorState.font).fontFamily,
+                  fontSize: editorState.fontSize,
+                }}>
+                {section.title || `小节 ${index + 1}`}
+              </h2>
               <p
-                className="text-gray-600 whitespace-pre-wrap text-sm leading-relaxed pl-2.5"
+                className="text-gray-600 whitespace-pre-wrap text-sm leading-relaxed pl-2.5 min-h-[2.5em]"
                 style={{
                   fontFamily: getFontStyle(editorState.font).fontFamily,
                   fontSize: editorState.fontSize,
@@ -172,7 +192,7 @@ const XhsEditor = () => {
       style={{
         backgroundColor: editorState.backgroundColor,
       }}>
-      <div className="p-6 h-full">
+      <div className="p-6 h-full flex flex-col">
         <h1
           className="text-lg font-bold mb-6 text-center"
           style={{
@@ -182,12 +202,12 @@ const XhsEditor = () => {
           {editorState.title || '标题'}
         </h1>
         <div
-          className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm"
+          className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm flex-1"
           style={{
             fontFamily: getFontStyle(editorState.font).fontFamily,
             fontSize: editorState.fontSize,
           }}>
-          <div className="text-gray-700 whitespace-pre-wrap" style={{ lineHeight: '1.8' }}>
+          <div className="text-gray-700 whitespace-pre-wrap min-h-[2.5em]" style={{ lineHeight: '1.8' }}>
             {editorState.sections[0]?.content || '输入内容...'}
           </div>
         </div>
@@ -208,7 +228,7 @@ const XhsEditor = () => {
             生成器
           </h1>
           <p className="text-gray-600 text-base md:text-lg text-center max-w-2xl mx-auto">
-            3分钟快速生成精美图文内容，一键导出分享 | 提升创作效率的必备工具
+            3分钟快速生成精美图文内容，一键导出分享
           </p>
         </div>
 
