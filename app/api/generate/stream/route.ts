@@ -27,6 +27,32 @@ export async function POST(req: Request) {
       );
     }
 
+    // 从用户消息中提取主题（如果有的话）
+    const userMessage = messages.find(m => m.role === 'user')?.content || '';
+
+    // 构建增强的消息数组
+    const enhancedMessages = [
+      {
+        role: "system",
+        content: `你是一位专业的小红书文案创作者，擅长创作吸引人的内容。请按照以下格式创作：
+
+1. 标题：简短吸引人，包含数字或emoji
+2. 开场：制造共鸣或好奇
+3. 正文：分点描述，重点突出，细节具体
+4. 结尾：互动引导
+5. 标签：3-5个相关话题标签
+
+注意事项：
+- 语气要自然亲切，像朋友间分享
+- 适当加入emoji表情
+- 使用口语化表达
+- 可以使用小红书平台常用词汇
+- 突出个人体验和真实感受
+- 保持内容真实可信，避免过度营销感`
+      },
+      ...messages
+    ];
+
     const response = await fetch(DEEPSEEK_API_URL, {
       method: 'POST',
       headers: {
@@ -35,15 +61,16 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 2000,
+        messages: enhancedMessages,
+        temperature: 0.8,
+        max_tokens: 1000,
         stream: true,
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json().catch(() => null);
+      throw new Error(`HTTP error! status: ${response.status}, details: ${JSON.stringify(errorData)}`);
     }
 
     const readableStream = new ReadableStream({
