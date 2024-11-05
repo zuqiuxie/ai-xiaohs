@@ -50,16 +50,36 @@ const XhsEditor = () => {
     if (!cardRef.current) return;
 
     try {
+      // 临时移除滚动样式
+      const originalStyle = cardRef.current.style.overflow;
+      cardRef.current.style.overflow = 'visible';
+      cardRef.current.style.height = 'auto';
+
       const canvas = await html2canvas(cardRef.current, {
         scale: 2, // 提高清晰度
         backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
         logging: false,
+        windowWidth: 720, // 设置更大的宽度以确保质量
+        windowHeight: 960,
+        useCORS: true, // 允许跨域图片
+        onclone: (clonedDoc) => {
+          // 在克隆的文档中也应用相同的样式
+          const clonedElement = clonedDoc.querySelector('[data-card]');
+          if (clonedElement) {
+            (clonedElement as HTMLElement).style.overflow = 'visible';
+            (clonedElement as HTMLElement).style.height = 'auto';
+          }
+        }
       });
+
+      // 恢复原始滚动样式
+      cardRef.current.style.overflow = originalStyle;
+      cardRef.current.style.height = '480px';
 
       // 创建下载链接
       const link = document.createElement('a');
       link.download = `小红书卡片_${Date.now()}.${format}`;
-      link.href = canvas.toDataURL(`image/${format}`);
+      link.href = canvas.toDataURL(`image/${format}`, 1.0);
       link.click();
     } catch (error) {
       console.error('下载失败:', error);
@@ -84,7 +104,8 @@ const XhsEditor = () => {
   const KnowledgeCard = () => (
     <div
       ref={cardRef}
-      className="w-[360px] h-[480px] mx-auto overflow-y-auto rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-sm"
+      data-card
+      className="w-[360px] h-[480px] overflow-y-auto rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-sm"
       style={{
         backgroundColor: editorState.backgroundColor,
       }}>
@@ -136,11 +157,12 @@ const XhsEditor = () => {
   const ThinkingCard = () => (
     <div
       ref={cardRef}
-      className="w-[360px] h-[480px] mx-auto overflow-y-auto rounded-xl shadow-lg"
+      data-card
+      className="w-[360px] h-[480px] overflow-y-auto rounded-xl shadow-lg"
       style={{
         backgroundColor: editorState.backgroundColor,
       }}>
-      <div className="p-6 h-full">
+      <div className="p-6">
         <h1
           className="text-lg font-bold mb-6"
           style={{
