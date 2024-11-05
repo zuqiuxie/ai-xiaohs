@@ -188,58 +188,65 @@ const XhsEditor = () => {
   );
 
   return (
-    <div className="h-screen bg-[#F5F5F7] overflow-hidden">
-      <div className="h-full max-w-[1200px] mx-auto p-4">
-        <div className="flex gap-8 h-full">
-          {/* 左侧编辑区 */}
-          <div className="w-[480px] overflow-y-auto pr-4 space-y-4">
-            {/* 模板选择 */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-xl p-3 shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
-              <div className="inline-flex p-1 gap-1 bg-gray-100 rounded-lg">
-                <button
-                  className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
-                    editorState.template === 'knowledge'
-                      ? 'bg-white text-gray-800 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                  onClick={() => handleTemplateChange('knowledge')}>
-                  知识干货模板
-                </button>
-                <button
-                  className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
-                    editorState.template === 'thinking'
-                      ? 'bg-white text-gray-800 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                  onClick={() => handleTemplateChange('thinking')}>
-                  个人思考模板
-                </button>
-              </div>
-            </div>
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+      <div className="h-full max-w-7xl mx-auto px-4 py-4">
+        {/* 顶部标题区 - 使用 container 限制宽度并居中 */}
+        <div className="max-w-2xl mx-auto text-center mb-4">
+          <h1 className="text-xl font-medium text-gray-900 mb-1">小红书图文卡片生成器</h1>
+          <p className="text-gray-500 text-xs">创建精美的图文内容，让你的分享更有格调</p>
+        </div>
 
-            {/* 样式设置 */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-gray-500">样式设置</h3>
+        {/* 主要内容区 */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-xl shadow-xl p-4 h-[calc(100vh-120px)]">
+          {/* 模板选择区 */}
+          <div className="mb-4">
+            <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
+              <button
+                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  editorState.template === 'knowledge'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => handleTemplateChange('knowledge')}>
+                分栏卡片
+              </button>
+              <button
+                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  editorState.template === 'thinking'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => handleTemplateChange('thinking')}>
+                纯文本卡片
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-6">
+            {/* 左侧编辑区 */}
+            <div className="flex-1 max-w-xl overflow-y-auto pr-2 h-[calc(100vh-200px)]">
+              {/* 样式设置 */}
+              <div className="bg-gray-50/50 rounded-lg p-4 mb-4">
+                <h3 className="text-xs font-medium text-gray-900 mb-3">样式设置</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">字体</span>
+                    <div className="flex-1">
+                      <label className="block text-xs text-gray-500 mb-1">字体</label>
                       <select
                         value={editorState.font}
                         onChange={e => setEditorState(prev => ({ ...prev, font: e.target.value }))}
-                        className="w-20 px-2 py-1.5 rounded-lg border border-gray-200 bg-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                        className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
                         <option value="楷体">楷体</option>
                         <option value="宋体">宋体</option>
                         <option value="黑体">黑体</option>
                       </select>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">字号</span>
+                    <div className="flex-1">
+                      <label className="block text-xs text-gray-500 mb-1">字号</label>
                       <select
                         value={editorState.fontSize}
                         onChange={e => setEditorState(prev => ({ ...prev, fontSize: e.target.value }))}
-                        className="w-20 px-2 py-1.5 rounded-lg border border-gray-200 bg-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                        className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
                         <option value="14px">14px</option>
                         <option value="16px">16px</option>
                         <option value="18px">18px</option>
@@ -247,87 +254,100 @@ const XhsEditor = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600">背景</span>
-                    <div className="flex gap-2">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">背景色</label>
+                    <div className="flex flex-wrap gap-2">
                       {[
-                        '#E6F7F3', // 清新绿
-                        '#F3E6FF', // 淡紫色
-                        '#FFF3E6', // 暖橙色
-                        '#E6F0FF', // 天蓝色
-                        '#FFE6E6', // 浅粉色
-                        '#F5F5F5', // 浅灰色
-                      ].map(color => (
+                        { color: '#E6F7F3', name: '清新绿' },
+                        { color: '#F3E6FF', name: '淡紫色' },
+                        { color: '#FFF3E6', name: '暖橙色' },
+                        { color: '#E6F0FF', name: '天蓝色' },
+                        { color: '#FFE6E6', name: '浅粉色' },
+                        { color: '#F5F5F5', name: '浅灰色' },
+                      ].map(({ color, name }) => (
                         <button
                           key={color}
-                          className={`w-7 h-7 rounded-full transition-all duration-200 ${
+                          className={`group relative w-6 h-6 rounded-full transition-all duration-300 ${
                             editorState.backgroundColor === color
-                              ? 'ring-2 ring-offset-2 ring-blue-500/30'
+                              ? 'ring-2 ring-offset-1 ring-blue-500/30 scale-110'
                               : 'hover:scale-110'
                           }`}
                           style={{ backgroundColor: color }}
-                          onClick={() => setEditorState(prev => ({ ...prev, backgroundColor: color }))}
-                        />
+                          onClick={() => setEditorState(prev => ({ ...prev, backgroundColor: color }))}>
+                          <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {name}
+                          </span>
+                        </button>
                       ))}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* 内容编辑 */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-gray-500">内容编辑</h3>
-                <input
-                  type="text"
-                  value={editorState.title}
-                  onChange={e => setEditorState(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="输入标题"
-                  className="w-full px-3 py-2 bg-transparent border-b border-gray-200 focus:outline-none focus:border-blue-500 transition-colors text-base"
-                />
+              {/* 内容编辑 */}
+              <div className="bg-gray-50/50 rounded-lg p-4">
+                <h3 className="text-xs font-medium text-gray-900 mb-3">内容编辑</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2">标题</label>
+                    <input
+                      type="text"
+                      value={editorState.title}
+                      onChange={e => setEditorState(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="输入标题"
+                      className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    />
+                  </div>
 
-                <div className="space-y-3 mt-3">
                   {editorState.template === 'knowledge' ? (
-                    editorState.sections.map((section, index) => (
-                      <div key={section.id} className="space-y-2 bg-gray-50/50 rounded-lg p-3">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={section.title}
+                    <div className="space-y-4">
+                      {editorState.sections.map((section, index) => (
+                        <div key={section.id} className="bg-white rounded-lg p-4 shadow-sm">
+                          <div className="flex items-center gap-3 mb-3">
+                            <input
+                              type="text"
+                              value={section.title}
+                              onChange={e => {
+                                const newSections = [...editorState.sections];
+                                newSections[index].title = e.target.value;
+                                setEditorState(prev => ({ ...prev, sections: newSections }));
+                              }}
+                              placeholder={`小节标题 ${index + 1}`}
+                              className="flex-1 px-3 py-2 bg-transparent border-b border-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                            />
+                            {editorState.sections.length > 1 && (
+                              <button
+                                onClick={() => handleRemoveSection(section.id)}
+                                className="text-sm text-gray-400 hover:text-red-500 transition-colors">
+                                删除
+                              </button>
+                            )}
+                          </div>
+                          <textarea
+                            value={section.content}
                             onChange={e => {
                               const newSections = [...editorState.sections];
-                              newSections[index].title = e.target.value;
+                              newSections[index].content = e.target.value;
                               setEditorState(prev => ({ ...prev, sections: newSections }));
                             }}
-                            placeholder={`小节标题 ${index + 1}`}
-                            className="flex-1 px-2 py-1.5 bg-transparent border-b border-gray-200 focus:outline-none focus:border-blue-500 transition-colors text-sm"
+                            placeholder="输入内容"
+                            className="w-full px-3 py-2 bg-gray-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[100px] resize-none"
                           />
-                          {editorState.sections.length > 1 && (
-                            <button
-                              onClick={() => handleRemoveSection(section.id)}
-                              className="text-sm text-red-500 hover:text-red-600 transition-colors">
-                              删除
-                            </button>
-                          )}
                         </div>
-                        <textarea
-                          value={section.content}
-                          onChange={e => {
-                            const newSections = [...editorState.sections];
-                            newSections[index].content = e.target.value;
-                            setEditorState(prev => ({ ...prev, sections: newSections }));
-                          }}
-                          placeholder={editorState.template === 'knowledge' ? '输入内容' : `思考点 ${index + 1}`}
-                          className="w-full px-2 py-1.5 bg-white/50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm min-h-[60px] resize-none"
-                        />
-                      </div>
-                    ))
+                      ))}
+                      {editorState.sections.length < 5 && (
+                        <button
+                          onClick={handleAddSection}
+                          className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors text-sm">
+                          + 添加小节
+                        </button>
+                      )}
+                    </div>
                   ) : (
-                    <div className="space-y-2 bg-gray-50/50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
                       <textarea
                         value={editorState.sections[0]?.content || ''}
-                        onChange={(e) => {
+                        onChange={e => {
                           const newSections = [{
                             ...defaultSection,
                             id: editorState.sections[0]?.id || uuidv4(),
@@ -336,7 +356,7 @@ const XhsEditor = () => {
                           setEditorState(prev => ({ ...prev, sections: newSections }));
                         }}
                         placeholder="输入你的思考内容..."
-                        className="w-full px-3 py-2 bg-white/50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm min-h-[300px] resize-none"
+                        className="w-full px-3 py-2 bg-gray-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[300px] resize-none"
                         style={{
                           fontFamily: editorState.font,
                           fontSize: editorState.fontSize,
@@ -346,39 +366,25 @@ const XhsEditor = () => {
                     </div>
                   )}
                 </div>
-
-                {editorState.template === 'knowledge' && editorState.sections.length < 5 && (
-                  <button
-                    onClick={handleAddSection}
-                    className="mt-3 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
-                    添加小节
-                  </button>
-                )}
               </div>
             </div>
-          </div>
 
-          {/* 右侧预览区 */}
-          <div className="flex-1">
-            <div className="sticky top-8 flex flex-col items-center gap-4">
-              {/* 预览卡片 */}
-              <div className="flex justify-center">
-                {editorState.template === 'knowledge' ? <KnowledgeCard /> : <ThinkingCard />}
-              </div>
+            {/* 右侧预览区 */}
+            <div className="w-[380px]">
+              <div className="flex flex-col items-start space-y-4">
+                <div className="relative group">
+                  <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  {editorState.template === 'knowledge' ? <KnowledgeCard /> : <ThinkingCard />}
+                </div>
 
-              {/* 下载按钮 */}
-              <div className="w-[360px]">
-                {' '}
-                {/* 与卡片等宽 */}
                 <button
                   onClick={() => handleDownload('png')}
-                  className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium flex items-center justify-center gap-2">
+                  className="w-[360px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
                   <svg
                     className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                    viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
