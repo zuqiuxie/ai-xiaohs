@@ -4,12 +4,16 @@ import { useState, useRef } from 'react';
 import { EditorState, Section, TemplateType } from '../types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import html2canvas from 'html2canvas';
+import AICardEditor from './AICardEditor';
+import AIContentEditor from './AIContentEditor';
 
 const defaultSection: Section = {
   id: uuidv4(),
   title: '',
   content: '',
 };
+
+export type CardType = 'column' | 'text' | 'ai'
 
 const XhsEditor = () => {
   const [editorState, setEditorState] = useState<EditorState>({
@@ -255,6 +259,15 @@ const XhsEditor = () => {
                 onClick={() => handleTemplateChange('thinking')}>
                 纯文本卡片
               </button>
+              <button
+                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  editorState.template === 'ai'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => handleTemplateChange('ai')}>
+                AI卡片
+              </button>
             </div>
           </div>
 
@@ -347,7 +360,7 @@ const XhsEditor = () => {
                     />
                   </div>
 
-                  {editorState.template === 'knowledge' ? (
+                  {editorState.template === 'knowledge' && (
                     <div className="space-y-4" ref={contentEditRef}>
                       {editorState.sections.map((section, index) => (
                         <div key={section.id} className="bg-white rounded-lg p-4 shadow-sm">
@@ -391,7 +404,9 @@ const XhsEditor = () => {
                         </button>
                       )}
                     </div>
-                  ) : (
+                  )}
+
+                  {editorState.template === 'thinking' && (
                     <div className="bg-white rounded-lg p-4 shadow-sm">
                       <textarea
                         value={editorState.sections[0]?.content || ''}
@@ -415,6 +430,21 @@ const XhsEditor = () => {
                       />
                     </div>
                   )}
+
+                  {editorState.template === 'ai' && (
+                    <AIContentEditor
+                      onContentGenerated={(content) => {
+                        const newSections = [
+                          {
+                            ...defaultSection,
+                            id: editorState.sections[0]?.id || uuidv4(),
+                            content: content,
+                          },
+                        ];
+                        setEditorState(prev => ({ ...prev, sections: newSections }));
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -423,7 +453,8 @@ const XhsEditor = () => {
             <div className="w-[380px] flex-shrink-0">
               <div className="flex flex-col items-start space-y-3">
                 <div className="relative group">
-                  {editorState.template === 'knowledge' ? <KnowledgeCard /> : <ThinkingCard />}
+                  {editorState.template === 'knowledge' && <KnowledgeCard />}
+                  {(editorState.template === 'thinking' || editorState.template === 'ai') && <ThinkingCard />}
                 </div>
 
                 <button
