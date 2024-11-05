@@ -27,7 +27,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
         }}>
         <div className="p-6 h-full">
           <h1
-            className="text-xl font-medium mb-6 text-center tracking-tight"
+            className="text-xl font-medium mb-6 text-center tracking-tight text-gray-900"
             style={{
               fontFamily: font,
               fontSize: titleSize,
@@ -39,61 +39,61 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
             style={{
               fontFamily: font,
             }}>
-            <div className="prose prose-sm max-w-none">
+            <div className="prose prose-sm max-w-none text-gray-900">
               <ReactMarkdown
                 components={{
                   h1: ({node, ...props}) => (
                     <h1
-                      className="font-bold mb-4"
+                      className="font-bold mb-4 text-gray-900"
                       style={{ fontSize: h1Size }}
                       {...props}
                     />
                   ),
                   h2: ({node, ...props}) => (
                     <h2
-                      className="font-bold mb-3"
+                      className="font-bold mb-3 text-gray-900"
                       style={{ fontSize: h2Size }}
                       {...props}
                     />
                   ),
                   h3: ({node, ...props}) => (
                     <h3
-                      className="font-bold mb-2"
+                      className="font-bold mb-2 text-gray-900"
                       style={{ fontSize: h3Size }}
                       {...props}
                     />
                   ),
                   p: ({node, ...props}) => (
                     <p
-                      className="mb-4 leading-relaxed"
+                      className="mb-4 leading-relaxed text-gray-900"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
                   ),
                   ul: ({node, ...props}) => (
                     <ul
-                      className="list-disc pl-4 mb-4"
+                      className="list-disc pl-4 mb-4 text-gray-900"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
                   ),
                   ol: ({node, ...props}) => (
                     <ol
-                      className="list-decimal pl-4 mb-4"
+                      className="list-decimal pl-4 mb-4 text-gray-900"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
                   ),
                   li: ({node, ...props}) => (
                     <li
-                      className="mb-1"
+                      className="mb-1 text-gray-900"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
                   ),
                   blockquote: ({node, ...props}) => (
                     <blockquote
-                      className="border-l-4 border-gray-300 pl-4 italic my-4"
+                      className="border-l-4 border-gray-300 pl-4 italic my-4 text-gray-700"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
@@ -101,27 +101,27 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                   code: ({node, inline, ...props}) =>
                     inline ? (
                       <code
-                        className="bg-gray-100 rounded px-1 py-0.5"
+                        className="bg-gray-100 rounded px-1 py-0.5 text-gray-800"
                         style={{ fontSize: contentSize }}
                         {...props}
                       />
                     ) : (
                       <code
-                        className="block bg-gray-100 rounded p-2 my-2 overflow-x-auto"
+                        className="block bg-gray-100 rounded p-2 my-2 overflow-x-auto text-gray-800"
                         style={{ fontSize: contentSize }}
                         {...props}
                       />
                     ),
                   strong: ({node, ...props}) => (
                     <strong
-                      className="font-bold"
+                      className="font-bold text-gray-900"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
                   ),
                   em: ({node, ...props}) => (
                     <em
-                      className="italic"
+                      className="italic text-gray-900"
                       style={{ fontSize: contentSize }}
                       {...props}
                     />
