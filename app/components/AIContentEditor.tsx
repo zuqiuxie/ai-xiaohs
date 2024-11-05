@@ -14,22 +14,68 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
 
     setIsLoading(true)
     setError(null)
+
     try {
-      const response = await fetch('/api/generate', {
+      const response = await fetch('/api/generate/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt: title })
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: '你是一个专业的内容创作者，擅长生成小红书风格的文章。请根据用户提供的主题，生成一篇结构清晰、内容丰富的文章。使用 Markdown 格式。'
+            },
+            {
+              role: 'user',
+              content: title
+            }
+          ]
+        })
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to generate content')
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
-      onContentGenerated(data.content)
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let content = ''
+
+      if (!reader) {
+        throw new Error('No reader available')
+      }
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value)
+          const lines = chunk.split('\n')
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(5))
+                if (data.content) {
+                  // 使用替换而不是追加的方式更新内容
+                  content = data.content
+                  onContentGenerated(content)
+                }
+              } catch (e) {
+                console.error('Error parsing JSON:', e)
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error reading stream:', error)
+        throw error
+      } finally {
+        reader.releaseLock()
+      }
     } catch (error) {
       console.error('Failed to generate content:', error)
       setError(error instanceof Error ? error.message : 'Failed to generate content')
