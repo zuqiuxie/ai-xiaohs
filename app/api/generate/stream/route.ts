@@ -6,25 +6,19 @@ const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 export async function POST(req: Request) {
   try {
     if (!DEEPSEEK_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: 'API key is not configured' }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      return new Response(JSON.stringify({ error: 'API key is not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid messages format' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Invalid messages format' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     // 从用户消息中提取主题（如果有的话）
@@ -33,31 +27,29 @@ export async function POST(req: Request) {
     // 构建增强的消息数组
     const enhancedMessages = [
       {
-        role: "system",
-        content: `你是一位专业的小红书文案创作者，擅长创作吸引人的内容。请按照以下格式创作：
-
-1. 标题：简短吸引人，包含数字或emoji
-2. 开场：制造共鸣或好奇
-3. 正文：分点描述，重点突出，细节具体
-4. 结尾：互动引导
-5. 标签：3-5个相关话题标签
+        role: 'system',
+        content: `你是一位专业的内容创作者。请根据用户的输入生成简洁的内容分享。
 
 注意事项：
-- 语气要自然亲切，像朋友间分享
-- 适当加入emoji表情
-- 使用口语化表达
-- 可以使用小红书平台常用词汇
-- 突出个人体验和真实感受
-- 保持内容真实可信，避免过度营销感`
+- 直接切入主题，不需要开场白
+- 分2-3个要点来说明，每个要点简短精炼
+- 语气自然友好，像朋友间交谈
+- 适当使用emoji表情，但不要过多
+- 使用简单的日常用语
+- 突出关键信息和实用建议
+- 内容要真实可信，避免过度营销感
+- 不需要加结尾互动和标签
+
+整体字数控制在220字以内。`,
       },
-      ...messages
+      ...messages,
     ];
 
     const response = await fetch(DEEPSEEK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
@@ -125,7 +117,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
       },
     });
   } catch (error: any) {

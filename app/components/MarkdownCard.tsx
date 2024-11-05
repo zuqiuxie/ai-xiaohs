@@ -17,7 +17,6 @@ interface ComponentProps {
 
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
   ({ title, content, font, fontSize, backgroundColor }, ref) => {
-    const titleSize = `${parseInt(fontSize) + 2}px`;
     const contentSize = fontSize;
     const h1Size = `${parseInt(fontSize) + 4}px`;
     const h2Size = `${parseInt(fontSize) + 2}px`;
@@ -32,14 +31,6 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
           backgroundColor,
         }}>
         <div className="p-6 h-full">
-          <h1
-            className="text-xl font-medium mb-6 text-center tracking-tight text-gray-900"
-            style={{
-              fontFamily: font,
-              fontSize: titleSize,
-            }}>
-            {title || '标题'}
-          </h1>
           <div
             className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm flex-1"
             style={{
