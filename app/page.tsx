@@ -1,5 +1,5 @@
-import XhsEditor from './components/XhsEditor'
+import XhsEditor from './components/XhsEditor';
 
 export default function Home() {
-  return <XhsEditor />
+  return <XhsEditor />;
 }

@@ -62,14 +62,14 @@ const XhsEditor = () => {
         windowWidth: 720, // 设置更大的宽度以确保质量
         windowHeight: 960,
         useCORS: true, // 允许跨域图片
-        onclone: (clonedDoc) => {
+        onclone: clonedDoc => {
           // 在克隆的文档中也应用相同的样式
           const clonedElement = clonedDoc.querySelector('[data-card]');
           if (clonedElement) {
             (clonedElement as HTMLElement).style.overflow = 'visible';
             (clonedElement as HTMLElement).style.height = 'auto';
           }
-        }
+        },
       });
 
       // 恢复原始滚动样式
@@ -90,13 +90,13 @@ const XhsEditor = () => {
   const getFontStyle = (font: string) => {
     // 中文字体名称映射
     const fontMap: Record<string, string> = {
-      '楷体': 'KaiTi, 楷体, STKaiti',
-      '宋体': 'SimSun, 宋体',
-      '黑体': 'SimHei, 黑体'
+      楷体: 'KaiTi, 楷体, STKaiti',
+      宋体: 'SimSun, 宋体',
+      黑体: 'SimHei, 黑体',
     };
 
     return {
-      fontFamily: fontMap[font] || font
+      fontFamily: fontMap[font] || font,
     };
   };
 
@@ -114,9 +114,8 @@ const XhsEditor = () => {
           className="text-xl font-medium mb-6 text-center tracking-tight"
           style={{
             fontFamily: getFontStyle(editorState.font).fontFamily,
-            fontSize: parseInt(editorState.fontSize) + 2 + 'px'
-          }}
-        >
+            fontSize: parseInt(editorState.fontSize) + 2 + 'px',
+          }}>
           {editorState.title || '什么是提示工程'}
         </h1>
         <div className="space-y-4">
@@ -131,9 +130,8 @@ const XhsEditor = () => {
                   className="text-base font-medium tracking-tight"
                   style={{
                     fontFamily: getFontStyle(editorState.font).fontFamily,
-                    fontSize: editorState.fontSize
-                  }}
-                >
+                    fontSize: editorState.fontSize,
+                  }}>
                   {section.title || `小节 ${index + 1}`}
                 </h2>
               </div>
@@ -141,9 +139,8 @@ const XhsEditor = () => {
                 className="text-gray-600 whitespace-pre-wrap text-sm leading-relaxed pl-2.5"
                 style={{
                   fontFamily: getFontStyle(editorState.font).fontFamily,
-                  fontSize: editorState.fontSize
-                }}
-              >
+                  fontSize: editorState.fontSize,
+                }}>
                 {section.content || '内容描述...'}
               </p>
             </div>
@@ -167,9 +164,8 @@ const XhsEditor = () => {
           className="text-lg font-bold mb-6"
           style={{
             fontFamily: getFontStyle(editorState.font).fontFamily,
-            fontSize: parseInt(editorState.fontSize) + 2 + 'px'
-          }}
-        >
+            fontSize: parseInt(editorState.fontSize) + 2 + 'px',
+          }}>
           {editorState.title || '个人思考'}
         </h1>
         <div
@@ -177,8 +173,7 @@ const XhsEditor = () => {
           style={{
             fontFamily: getFontStyle(editorState.font).fontFamily,
             fontSize: editorState.fontSize,
-          }}
-        >
+          }}>
           <div className="text-gray-700 whitespace-pre-wrap" style={{ lineHeight: '1.8' }}>
             {editorState.sections[0]?.content || '输入内容...'}
           </div>
@@ -188,18 +183,26 @@ const XhsEditor = () => {
   );
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-      <div className="h-full max-w-7xl mx-auto px-6 py-4">
-        {/* 顶部标题区 - 使用 container 限制宽度并居中 */}
-        <div className="max-w-2xl mx-auto text-center mb-4">
-          <h1 className="text-xl font-medium text-gray-900 mb-1">小红书图文卡片生成器</h1>
-          <p className="text-gray-500 text-xs">创建精美的图文内容，让你的分享更有格调</p>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* 顶部标题区 */}
+        <div className="flex flex-col items-center justify-center py-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-3">
+            小红书
+            <span className="bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 text-transparent bg-clip-text">
+              图文卡片
+            </span>
+            生成器
+          </h1>
+          <p className="text-gray-600 text-base md:text-lg text-center max-w-2xl mx-auto">
+            3分钟快速生成精美图文内容，一键导出分享 | 提升创作效率的必备工具
+          </p>
         </div>
 
-        {/* 主要内容区 */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-xl shadow-xl p-4 h-[calc(100vh-120px)]">
-          {/* 模板选择区 */}
-          <div className="mb-4">
+        {/* 主要内容区 - 移除卡片样式，减小内边距和间距 */}
+        <div className="mt-4">
+          {/* 模板选择区 - 减小上下间距 */}
+          <div className="mb-3">
             <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
               <button
                 className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
@@ -222,12 +225,12 @@ const XhsEditor = () => {
             </div>
           </div>
 
-          <div className="flex gap-12">
-            {/* 左侧编辑区 */}
-            <div className="flex-1 max-w-2xl overflow-y-auto pr-2 h-[calc(100vh-200px)]">
-              {/* 样式设置 */}
-              <div className="bg-gray-50/50 rounded-lg p-4 mb-4">
-                <h3 className="text-xs font-medium text-gray-900 mb-3">样式设置</h3>
+          <div className="flex gap-8">
+            {/* 左侧编辑区 - 调整高度和滚动 */}
+            <div className="flex-1 max-w-2xl">
+              {/* 样式设置区 - 减小内边距 */}
+              <div className="bg-white/60 rounded-lg p-3 mb-3">
+                <h3 className="text-xs font-medium text-gray-900 mb-2">样式设置</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
@@ -284,9 +287,9 @@ const XhsEditor = () => {
                 </div>
               </div>
 
-              {/* 内容编辑 */}
-              <div className="bg-gray-50/50 rounded-lg p-4">
-                <h3 className="text-xs font-medium text-gray-900 mb-3">内容编辑</h3>
+              {/* 内容编辑区 - 减小内边距 */}
+              <div className="bg-white/60 rounded-lg p-3">
+                <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs text-gray-500 mb-2">标题</label>
@@ -348,11 +351,13 @@ const XhsEditor = () => {
                       <textarea
                         value={editorState.sections[0]?.content || ''}
                         onChange={e => {
-                          const newSections = [{
-                            ...defaultSection,
-                            id: editorState.sections[0]?.id || uuidv4(),
-                            content: e.target.value
-                          }];
+                          const newSections = [
+                            {
+                              ...defaultSection,
+                              id: editorState.sections[0]?.id || uuidv4(),
+                              content: e.target.value,
+                            },
+                          ];
                           setEditorState(prev => ({ ...prev, sections: newSections }));
                         }}
                         placeholder="输入你的思考内容..."
@@ -360,7 +365,7 @@ const XhsEditor = () => {
                         style={{
                           fontFamily: editorState.font,
                           fontSize: editorState.fontSize,
-                          lineHeight: '1.8'
+                          lineHeight: '1.8',
                         }}
                       />
                     </div>
@@ -369,22 +374,17 @@ const XhsEditor = () => {
               </div>
             </div>
 
-            {/* 右侧预览区 */}
-            <div className="w-[380px] flex-shrink-0">
-              <div className="flex flex-col items-start space-y-4">
+            {/* 右侧预览区 - 调整位置固定 */}
+            <div className="w-[380px] flex-shrink-0 sticky top-6">
+              <div className="flex flex-col items-start space-y-3">
                 <div className="relative group">
-                  <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   {editorState.template === 'knowledge' ? <KnowledgeCard /> : <ThinkingCard />}
                 </div>
 
                 <button
                   onClick={() => handleDownload('png')}
-                  className="w-[360px] px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
+                  className="w-[360px] px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
