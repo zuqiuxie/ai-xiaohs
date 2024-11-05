@@ -189,7 +189,7 @@ const XhsEditor = () => {
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-      <div className="h-full max-w-7xl mx-auto px-4 py-4">
+      <div className="h-full max-w-7xl mx-auto px-6 py-4">
         {/* 顶部标题区 - 使用 container 限制宽度并居中 */}
         <div className="max-w-2xl mx-auto text-center mb-4">
           <h1 className="text-xl font-medium text-gray-900 mb-1">小红书图文卡片生成器</h1>
@@ -222,9 +222,9 @@ const XhsEditor = () => {
             </div>
           </div>
 
-          <div className="flex gap-6">
+          <div className="flex gap-12">
             {/* 左侧编辑区 */}
-            <div className="flex-1 max-w-xl overflow-y-auto pr-2 h-[calc(100vh-200px)]">
+            <div className="flex-1 max-w-2xl overflow-y-auto pr-2 h-[calc(100vh-200px)]">
               {/* 样式设置 */}
               <div className="bg-gray-50/50 rounded-lg p-4 mb-4">
                 <h3 className="text-xs font-medium text-gray-900 mb-3">样式设置</h3>
@@ -370,7 +370,7 @@ const XhsEditor = () => {
             </div>
 
             {/* 右侧预览区 */}
-            <div className="w-[380px]">
+            <div className="w-[380px] flex-shrink-0">
               <div className="flex flex-col items-start space-y-4">
                 <div className="relative group">
                   <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
