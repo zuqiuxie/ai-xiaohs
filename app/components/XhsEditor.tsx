@@ -162,7 +162,7 @@ const XhsEditor = () => {
       style={{
         backgroundColor: editorState.backgroundColor,
       }}>
-      <div className="p-6">
+      <div className="p-6 h-full">
         <h1
           className="text-lg font-bold mb-6"
           style={{
@@ -173,14 +173,15 @@ const XhsEditor = () => {
           {editorState.title || '个人思考'}
         </h1>
         <div
-          className="text-gray-700 whitespace-pre-wrap"
+          className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm"
           style={{
             fontFamily: getFontStyle(editorState.font).fontFamily,
             fontSize: editorState.fontSize,
-            lineHeight: '1.8'
           }}
         >
-          {editorState.sections[0]?.content || '输入内容...'}
+          <div className="text-gray-700 whitespace-pre-wrap" style={{ lineHeight: '1.8' }}>
+            {editorState.sections[0]?.content || '输入内容...'}
+          </div>
         </div>
       </div>
     </div>
