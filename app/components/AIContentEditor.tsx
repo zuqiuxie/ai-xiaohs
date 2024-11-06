@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAnalytics } from '../hooks/useAnalytics';
 
 interface AIContentEditorProps {
   title: string;
@@ -8,12 +9,20 @@ interface AIContentEditorProps {
 export default function AIContentEditor({ title, onContentGenerated }: AIContentEditorProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { trackEvent } = useAnalytics();
 
   const generateContent = async () => {
     if (!title) return
 
     setIsLoading(true)
     setError(null)
+
+    // 记录生成内容的开始
+    trackEvent('generate_content', {
+      status: 'start',
+      title,
+      timestamp: new Date().toISOString(),
+    });
 
     try {
       const response = await fetch('/api/generate/stream', {
@@ -76,9 +85,24 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
       } finally {
         reader.releaseLock()
       }
+
+      // 记录生成成功
+      trackEvent('generate_content', {
+        status: 'success',
+        title,
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       console.error('Failed to generate content:', error)
       setError(error instanceof Error ? error.message : 'Failed to generate content')
+
+      // 记录生成失败
+      trackEvent('generate_content', {
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        title,
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setIsLoading(false)
     }

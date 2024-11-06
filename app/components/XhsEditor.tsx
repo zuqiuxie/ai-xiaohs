@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { EditorState, Section, TemplateType } from '../types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import html2canvas from 'html2canvas';
 import AIContentEditor from './AIContentEditor';
 import MarkdownCard from './MarkdownCard';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 const defaultSection: Section = {
   id: uuidv4(),
@@ -28,12 +29,28 @@ const XhsEditor = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   const contentEditRef = useRef<HTMLDivElement>(null);
 
+  const { trackEvent } = useAnalytics();
+
+  // 在组件加载时记录页面访问
+  useEffect(() => {
+    trackEvent('page_view', {
+      page: 'editor',
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
+
   const handleTemplateChange = (template: TemplateType) => {
     setEditorState(prev => ({
       ...prev,
       template,
       sections: [{ ...defaultSection }],
     }));
+
+    // 记录模板切换事件
+    trackEvent('change_template', {
+      template_type: template,
+      timestamp: new Date().toISOString(),
+    });
   };
 
   const handleAddSection = () => {
@@ -118,6 +135,13 @@ const XhsEditor = () => {
       link.download = `小红书卡片_${Date.now()}.${format}`;
       link.href = canvas.toDataURL(`image/${format}`, 1.0);
       link.click();
+
+      // 记录下载事件
+      trackEvent('download_image', {
+        format,
+        template_type: editorState.template,
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       console.error('下载失败:', error);
     }
@@ -219,6 +243,22 @@ const XhsEditor = () => {
     </div>
   );
 
+  // 在样式改变时记录
+  const handleStyleChange = (type: 'font' | 'fontSize' | 'backgroundColor', value: string) => {
+    setEditorState(prev => ({ ...prev, [type]: value }));
+
+    trackEvent('change_style', {
+      style_type: type,
+      style_value: value,
+      timestamp: new Date().toISOString(),
+    });
+  };
+
+  // 在 XhsEditor 组件中添加新的处理函数
+  const handleTitleChange = (value: string) => {
+    setEditorState(prev => ({ ...prev, title: value }));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -283,7 +323,7 @@ const XhsEditor = () => {
                       <label className="block text-xs text-gray-500 mb-1">字体</label>
                       <select
                         value={editorState.font}
-                        onChange={e => setEditorState(prev => ({ ...prev, font: e.target.value }))}
+                        onChange={e => handleStyleChange('font', e.target.value)}
                         className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
                         <option value="思源黑体">思源黑体</option>
                         <option value="思源宋体">思源宋体</option>
@@ -297,7 +337,7 @@ const XhsEditor = () => {
                       <label className="block text-xs text-gray-500 mb-1">字号</label>
                       <select
                         value={editorState.fontSize}
-                        onChange={e => setEditorState(prev => ({ ...prev, fontSize: e.target.value }))}
+                        onChange={e => handleStyleChange('fontSize', e.target.value)}
                         className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
                         <option value="12px">12px - 小号</option>
                         <option value="14px">14px - 正常</option>
@@ -334,7 +374,7 @@ const XhsEditor = () => {
                               : 'hover:scale-110'
                           }`}
                           style={{ backgroundColor: color }}
-                          onClick={() => setEditorState(prev => ({ ...prev, backgroundColor: color }))}>
+                          onClick={() => handleStyleChange('backgroundColor', color)}>
                           <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             {name}
                           </span>
@@ -355,7 +395,7 @@ const XhsEditor = () => {
                     <input
                       type="text"
                       value={editorState.title}
-                      onChange={e => setEditorState(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={e => handleTitleChange(e.target.value)}
                       placeholder="输入标题"
                       className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                     />
