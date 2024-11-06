@@ -12,11 +12,12 @@ interface MarkdownCardProps {
   font: string;
   fontSize: string;
   backgroundColor: string;
-  onContentChange?: (content: string) => void;
+  onContentChange: (content: string) => void;
+  onTitleChange: (title: string) => void;
 }
 
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
-  ({ content, font, fontSize, backgroundColor, onContentChange }, ref) => {
+  ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
     const contentSize = fontSize;
     const h1Size = `${parseInt(fontSize) + 4}px`;

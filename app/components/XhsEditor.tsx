@@ -16,6 +16,44 @@ const defaultSection: Section = {
 
 export type CardType = 'column' | 'text' | 'ai';
 
+const FONT_OPTIONS = {
+  中文简约: [
+    { label: '思源黑体', value: '"Source Han Sans SC", "Noto Sans SC", sans-serif' },
+    { label: '思源宋体', value: '"Source Han Serif SC", "Noto Serif SC", serif' },
+    { label: '阿里巴巴普惠体', value: '"Alibaba PuHuiTi", sans-serif' },
+    { label: '站酷高端黑', value: '"ZCOOL QingKe HuangYou", sans-serif' },
+    { label: '方正兰亭黑', value: '"FZLanTingHei", sans-serif' },
+  ],
+  中文传统: [
+    { label: '霞鹜文楷', value: '"LXGW WenKai", serif' },
+    { label: '楷体', value: 'KaiTi, STKaiti, serif' },
+    { label: '宋体', value: 'SimSun, serif' },
+    { label: '黑体', value: 'SimHei, sans-serif' },
+    { label: '仿宋', value: 'FangSong, STFangSong, serif' },
+  ],
+  英文现代: [
+    { label: 'Inter', value: '"Inter", sans-serif' },
+    { label: 'Roboto', value: '"Roboto", sans-serif' },
+    { label: 'Open Sans', value: '"Open Sans", sans-serif' },
+    { label: 'Montserrat', value: '"Montserrat", sans-serif' },
+    { label: 'Poppins', value: '"Poppins", sans-serif' },
+  ],
+  英文经典: [
+    { label: 'Playfair Display', value: '"Playfair Display", serif' },
+    { label: 'Merriweather', value: '"Merriweather", serif' },
+    { label: 'Lora', value: '"Lora", serif' },
+    { label: 'Crimson Pro', value: '"Crimson Pro", serif' },
+    { label: 'Garamond', value: '"EB Garamond", serif' },
+  ],
+  手写风格: [
+    { label: '手写体', value: '"Ma Shan Zheng", cursive' },
+    { label: '潇洒体', value: '"Liu Jian Mao Cao", cursive' },
+    { label: '有爱体', value: '"Zhi Mang Xing", cursive' },
+    { label: 'Caveat', value: '"Caveat", cursive' },
+    { label: 'Dancing Script', value: '"Dancing Script", cursive' },
+  ],
+};
+
 const XhsEditor = () => {
   const [editorState, setEditorState] = useState<EditorState>({
     template: 'knowledge',
@@ -95,100 +133,51 @@ const XhsEditor = () => {
       const clone = previewElement.cloneNode(true) as HTMLElement;
       tempContainer.appendChild(clone);
 
-      // 3. 设置克隆元素的基础样式
+      // 3. 设置基础样式
       clone.style.width = `${width}px`;
       clone.style.height = 'auto';
       clone.style.overflow = 'visible';
       clone.style.maxHeight = 'none';
       clone.style.transform = 'none';
       clone.style.position = 'static';
+      clone.style.backgroundColor = editorState.backgroundColor;
 
-      // 4. 特别处理列表和背景样式
-      const applyStyles = (element: HTMLElement) => {
-        // 处理内容区背景卡片
-        const contentCard = element.querySelector('.bg-white\\/60');
-        if (contentCard instanceof HTMLElement) {
-          contentCard.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
-          contentCard.style.backdropFilter = 'blur(8px)';
-          contentCard.style.borderRadius = '0.5rem';
-          contentCard.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+      // 4. 处理内容样式
+      const contentCards = clone.querySelectorAll('.bg-white\\/60');
+      contentCards.forEach(card => {
+        if (card instanceof HTMLElement) {
+          card.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+          card.style.backdropFilter = 'blur(8px)';
+          card.style.borderRadius = '0.5rem';
+          card.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
         }
+      });
 
-        // 处理有序列表
-        const orderedLists = element.querySelectorAll('ol');
-        orderedLists.forEach(ol => {
-          if (ol instanceof HTMLElement) {
-            ol.style.listStyle = 'none'; // 移除默认序号
-            ol.style.counterReset = 'item'; // 重置计数器
-            ol.style.paddingLeft = '0';
-            ol.style.marginLeft = '0';
-          }
-        });
+      // 5. 处理文本样式
+      const textElements = clone.querySelectorAll('h1, h2, h3, p, li');
+      textElements.forEach(element => {
+        if (element instanceof HTMLElement) {
+          element.style.fontFamily = getFontStyle(editorState.font).fontFamily;
+          element.style.fontSize = editorState.fontSize;
+          element.style.lineHeight = '1.6';
+        }
+      });
 
-        // 处理无序列表
-        const unorderedLists = element.querySelectorAll('ul');
-        unorderedLists.forEach(ul => {
-          if (ul instanceof HTMLElement) {
-            ul.style.listStyle = 'none'; // 移除默认圆点
-            ul.style.paddingLeft = '0';
-            ul.style.marginLeft = '0';
-          }
-        });
+      // 6. 等待样式应用
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-        // 处理列表项
-        const listItems = element.querySelectorAll('li');
-        listItems.forEach((li, index) => {
-          if (li instanceof HTMLElement) {
-            const isOrderedList = li.parentElement?.tagName.toLowerCase() === 'ol';
-            const isUnorderedList = li.parentElement?.tagName.toLowerCase() === 'ul';
-
-            li.style.position = 'relative';
-            li.style.paddingLeft = '2em'; // 为序号/圆点预留空间
-            li.style.marginBottom = '0.5em';
-            li.style.lineHeight = '1.6';
-            li.style.display = 'block';
-
-            // 创建序号/圆点容器
-            const marker = document.createElement('span');
-            marker.style.position = 'absolute';
-            marker.style.left = '0';
-            marker.style.top = '0';
-            marker.style.width = '1.5em';
-            marker.style.textAlign = 'right';
-            marker.style.paddingRight = '0.5em';
-
-            if (isOrderedList) {
-              marker.textContent = `${index + 1}.`;
-              marker.style.color = '#111827'; // text-gray-900
-            } else if (isUnorderedList) {
-              marker.textContent = '•';
-              marker.style.color = '#111827'; // text-gray-900
-            }
-
-            // 插入序号/圆点到列表项开头
-            li.insertBefore(marker, li.firstChild);
-          }
-        });
-      };
-
-      // 应用样式
-      applyStyles(clone);
-
-      // 5. 等待内容渲染
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // 6. 获取实际内容高度
+      // 7. 设置导出尺寸
       const contentHeight = clone.scrollHeight;
       const minHeight = (width * 4) / 3;
       const exportHeight = Math.max(contentHeight, minHeight);
       clone.style.height = `${exportHeight}px`;
 
-      // 7. 配置 html2canvas 选项
+      // 8. 生成图片
       const canvas = await html2canvas(clone, {
         scale: 2,
         backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
         logging: false,
-        width: width,
+        width,
         height: exportHeight,
         windowWidth: width,
         windowHeight: exportHeight,
@@ -200,21 +189,17 @@ const XhsEditor = () => {
             clonedElement.style.width = `${width}px`;
             clonedElement.style.height = `${exportHeight}px`;
             clonedElement.style.overflow = 'visible';
-            clonedElement.style.transform = 'none';
-
-            // 在克隆文档中再次应用样式
-            applyStyles(clonedElement);
           }
         },
       });
 
-      // 8. 创建下载链接
+      // 9. 下载图片
       const link = document.createElement('a');
       link.download = `小红书卡片_${Date.now()}.${format}`;
       link.href = canvas.toDataURL(`image/${format}`, 1.0);
       link.click();
 
-      // 9. 清理临时元素
+      // 10. 清理临时元素
       document.body.removeChild(tempContainer);
 
       // 记录下载事件
@@ -230,18 +215,8 @@ const XhsEditor = () => {
 
   // 辅助函数：获取字体样式
   const getFontStyle = (font: string) => {
-    // 中文字体名称映射
-    const fontMap: Record<string, string> = {
-      思源黑体: '"Source Han Sans SC", "Noto Sans SC", sans-serif',
-      思源宋体: '"Source Han Serif SC", "Noto Serif SC", serif',
-      霞鹜文楷: '"LXGW WenKai", serif',
-      楷体: 'KaiTi, STKaiti, serif',
-      宋体: 'SimSun, serif',
-      黑体: 'SimHei, sans-serif',
-    };
-
     return {
-      fontFamily: fontMap[font] || font,
+      fontFamily: font, // 直接使用字体值，因为现在我们存储的就是完整的 font-family 字符串
     };
   };
 
@@ -422,12 +397,15 @@ const XhsEditor = () => {
                         value={editorState.font}
                         onChange={e => handleStyleChange('font', e.target.value)}
                         className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
-                        <option value="思源黑体">思源黑体</option>
-                        <option value="思源宋体">思源宋体</option>
-                        <option value="霞鹜文楷">霞鹜文楷</option>
-                        <option value="楷体">楷体</option>
-                        <option value="宋体">宋体</option>
-                        <option value="黑体">黑体</option>
+                        {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
+                          <optgroup key={category} label={category}>
+                            {fonts.map(font => (
+                              <option key={font.label} value={font.value}>
+                                {font.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
                       </select>
                     </div>
                     <div className="flex-1">
