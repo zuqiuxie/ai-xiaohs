@@ -12,6 +12,8 @@ export async function POST(req: Request) {
       });
     }
 
+    console.log('API Key configured:', !!DEEPSEEK_API_KEY);
+
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
@@ -60,8 +62,17 @@ export async function POST(req: Request) {
       }),
     });
 
+    // Add response status and headers logging
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
+      console.error('API Error:', {
+        status: response.status,
+        errorData,
+        url: DEEPSEEK_API_URL,
+      });
       throw new Error(`HTTP error! status: ${response.status}, details: ${JSON.stringify(errorData)}`);
     }
 
@@ -82,26 +93,38 @@ export async function POST(req: Request) {
 
             // 解码数据
             const chunk = new TextDecoder().decode(value);
+            console.log('Raw chunk:', chunk);
             const lines = chunk.split('\n');
 
             for (const line of lines) {
               if (line.startsWith('data: ')) {
-                const data = line.slice(5);
-                if (data === '[DONE]') continue;
+                const data = line.slice(5).trim();
+
+                // 先检查是否是 [DONE] 标记
+                if (data === '[DONE]') {
+                  console.log('Stream completed with [DONE] signal');
+                  continue;
+                }
 
                 try {
+                  console.log('Received data chunk:', data);
                   const parsed = JSON.parse(data);
+                  console.log('Parsed data:', parsed);
+
                   if (parsed.choices[0]?.delta?.content) {
                     accumulatedContent += parsed.choices[0].delta.content;
-                    // 发送累积的内容（替换而不是追加）
+                    console.log('Accumulated content:', accumulatedContent);
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: accumulatedContent })}\n\n`));
                   }
                 } catch (e) {
-                  console.error('Error parsing JSON:', e);
+                  console.error('Error parsing JSON:', e, 'Raw data:', data);
+                  // 不要中断流，继续处理下一条数据
+                  continue;
                 }
               }
             }
           }
+          // 将 controller.close() 移到 while 循环外部
           controller.close();
         } catch (error) {
           console.error('Stream processing error:', error);
