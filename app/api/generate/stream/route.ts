@@ -1,9 +1,11 @@
+import { NextRequest } from 'next/server';
+
 export const runtime = 'edge';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     if (!DEEPSEEK_API_KEY) {
       return new Response(JSON.stringify({ error: 'API key is not configured' }), {
