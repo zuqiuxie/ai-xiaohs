@@ -62,26 +62,25 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
           if (done) break
 
           const chunk = decoder.decode(value)
+          console.log('Received chunk:', chunk)
+
           const lines = chunk.split('\n')
 
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(5))
-                if (data.content) {
-                  // 使用替换而不是追加的方式更新内容
+                if (data.content && data.content.trim()) {
                   content = data.content
+                  console.log('Updated content:', content)
                   onContentGenerated(content)
                 }
               } catch (e) {
-                console.error('Error parsing JSON:', e)
+                console.error('Error parsing chunk:', e)
               }
             }
           }
         }
-      } catch (error) {
-        console.error('Error reading stream:', error)
-        throw error
       } finally {
         reader.releaseLock()
       }
