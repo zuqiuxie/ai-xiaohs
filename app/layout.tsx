@@ -14,20 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
+      <body className="min-h-screen">
         {children}
-        <Analytics mode="production" debug={false} />
+        <Analytics />
       </body>
     </html>
-  )
+  );
 }
