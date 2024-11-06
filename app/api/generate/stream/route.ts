@@ -86,6 +86,7 @@ export async function POST(req: Request) {
               }
             } catch (e) {
               console.error('Parse error:', e);
+              continue;
             }
           }
         }

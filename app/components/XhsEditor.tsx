@@ -84,30 +84,39 @@ const XhsEditor = () => {
       const previewElement = cardRef.current;
       const { width } = previewElement.getBoundingClientRect();
 
-      // 保存原始样式
-      const originalStyles = {
-        width: previewElement.style.width,
-        height: previewElement.style.height,
-        overflow: previewElement.style.overflow,
-        position: previewElement.style.position,
-      };
+      // 1. 创建一个临时容器来克隆预览元素
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '-9999px';
+      document.body.appendChild(tempContainer);
 
-      // 临时修改样式以捕获完整内容
-      previewElement.style.width = `${width}px`;
-      previewElement.style.height = 'auto';  // 让高度自适应内容
-      previewElement.style.overflow = 'visible';
-      previewElement.style.position = 'relative';
+      // 2. 克隆预览元素到临时容器
+      const clone = previewElement.cloneNode(true) as HTMLElement;
+      tempContainer.appendChild(clone);
 
-      // 获取实际内容高度
-      const contentHeight = previewElement.scrollHeight;
+      // 3. 设置克隆元素的样式
+      clone.style.width = `${width}px`;
+      clone.style.height = 'auto';
+      clone.style.overflow = 'visible';
+      clone.style.maxHeight = 'none';
+      clone.style.transform = 'none';
+      clone.style.position = 'static';
+
+      // 4. 等待内容渲染
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 5. 获取实际内容高度
+      const contentHeight = clone.scrollHeight;
       // 确保最小高度为宽度的4/3，保持比例
       const minHeight = (width * 4) / 3;
       const exportHeight = Math.max(contentHeight, minHeight);
 
-      // 设置最终导出尺寸
-      previewElement.style.height = `${exportHeight}px`;
+      // 6. 设置最终导出尺寸
+      clone.style.height = `${exportHeight}px`;
 
-      const canvas = await html2canvas(previewElement, {
+      // 7. 配置 html2canvas 选项
+      const canvas = await html2canvas(clone, {
         scale: 2, // 提高清晰度
         backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
         logging: false,
@@ -116,25 +125,26 @@ const XhsEditor = () => {
         windowWidth: width,
         windowHeight: exportHeight,
         useCORS: true,
-        onclone: clonedDoc => {
+        allowTaint: true,
+        onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.querySelector('[data-card]');
           if (clonedElement instanceof HTMLElement) {
             clonedElement.style.width = `${width}px`;
             clonedElement.style.height = `${exportHeight}px`;
             clonedElement.style.overflow = 'visible';
-            clonedElement.style.position = 'relative';
+            clonedElement.style.transform = 'none';
           }
         },
       });
 
-      // 恢复原始样式
-      Object.assign(previewElement.style, originalStyles);
-
-      // 创建下载链接
+      // 8. 创建下载链接
       const link = document.createElement('a');
       link.download = `小红书卡片_${Date.now()}.${format}`;
       link.href = canvas.toDataURL(`image/${format}`, 1.0);
       link.click();
+
+      // 9. 清理临时元素
+      document.body.removeChild(tempContainer);
 
       // 记录下载事件
       trackEvent('download_image', {

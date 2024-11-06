@@ -8,5 +8,15 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('tailwind-scrollbar')({ nocompatible: true }),
+  ],
+  variants: {
+    extend: {
+      scrollbar: ['rounded'],
+      maxHeight: ['print'],
+      overflow: ['print'],
+    }
+  }
 }
