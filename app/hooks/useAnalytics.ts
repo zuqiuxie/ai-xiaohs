@@ -8,13 +8,11 @@ type EventName =
   | 'change_style'        // 修改样式
   | 'page_view';          // 页面访问
 
-// 定义允许的属性值类型
-type AllowedPropertyValue = string | number | boolean | null;
+// Define allowed property value types
+type AllowedPropertyValues = string | number | boolean | null;
 
-// 修改 EventProperties 接口以匹配 Vercel Analytics 的要求
-interface EventProperties {
-  [key: string]: AllowedPropertyValue;
-}
+// Define the properties type
+type EventProperties = Record<string, AllowedPropertyValues>;
 
 export function useAnalytics() {
   const trackEvent = useCallback((
@@ -22,14 +20,7 @@ export function useAnalytics() {
     properties?: EventProperties
   ) => {
     try {
-      // 过滤掉 undefined 值
-      const cleanProperties = properties ?
-        Object.fromEntries(
-          Object.entries(properties).filter(([_, value]) => value !== undefined)
-        ) as Record<string, AllowedPropertyValue> :
-        undefined;
-
-      track(eventName, cleanProperties);
+      track(eventName, properties);
     } catch (error) {
       console.error('Analytics tracking error:', error);
     }
