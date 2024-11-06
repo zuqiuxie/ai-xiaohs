@@ -37,12 +37,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
             }}>
             {!content ? (
               <div className="h-[400px] flex flex-col items-center justify-center text-gray-400 space-y-4">
-                <svg
-                  className="w-12 h-12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M9.5 3H5.5C4.11929 3 3 4.11929 3 5.5V9.5C3 10.8807 4.11929 12 5.5 12H9.5C10.8807 12 12 10.8807 12 9.5V5.5C12 4.11929 10.8807 3 9.5 3Z"
                     stroke="currentColor"
@@ -81,8 +76,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                       <h1
                         className="text-xl font-bold mb-4 text-gray-900 break-words"
                         style={{ fontSize: h1Size }}
-                        {...props}
-                      >
+                        {...props}>
                         {children}
                       </h1>
                     ),
@@ -90,8 +84,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                       <h2
                         className="text-lg font-bold mb-3 text-gray-900 break-words"
                         style={{ fontSize: h2Size }}
-                        {...props}
-                      >
+                        {...props}>
                         {children}
                       </h2>
                     ),
@@ -99,44 +92,53 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                       <h3
                         className="text-base font-bold mb-2 text-gray-900 break-words"
                         style={{ fontSize: h3Size }}
-                        {...props}
-                      >
+                        {...props}>
                         {children}
                       </h3>
                     ),
                     p: ({ children, ...props }: ComponentProps) => (
                       <p
-                        className="mb-4 leading-relaxed text-gray-900 break-words whitespace-pre-wrap"
-                        style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                        className="mb-2 text-gray-900 whitespace-pre-wrap"
+                        style={{
+                          fontSize: contentSize,
+                          lineHeight: '1.6',
+                        }}
+                        {...props}>
                         {children}
                       </p>
                     ),
                     ul: ({ children, ...props }: ComponentProps) => (
                       <ul
-                        className="list-disc pl-4 mb-4 text-gray-900 break-words"
-                        style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                        className="list-disc mb-2 text-gray-900"
+                        style={{
+                          fontSize: contentSize,
+                          lineHeight: '1.6',
+                          paddingLeft: '1.2em',
+                        }}
+                        {...props}>
                         {children}
                       </ul>
                     ),
                     ol: ({ children, ...props }: ComponentProps) => (
                       <ol
-                        className="list-decimal pl-4 mb-4 text-gray-900 break-words"
-                        style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                        className="list-decimal mb-2 text-gray-900"
+                        style={{
+                          fontSize: contentSize,
+                          lineHeight: '1.6',
+                          paddingLeft: '1.2em',
+                        }}
+                        {...props}>
                         {children}
                       </ol>
                     ),
                     li: ({ children, ...props }: ComponentProps) => (
                       <li
-                        className="mb-1 text-gray-900 break-words"
-                        style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                        className="mb-1 text-gray-900"
+                        style={{
+                          fontSize: contentSize,
+                          lineHeight: '1.6',
+                        }}
+                        {...props}>
                         {children}
                       </li>
                     ),
@@ -144,8 +146,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                       <blockquote
                         className="border-l-4 border-gray-300 pl-4 italic my-4 text-gray-700 break-words"
                         style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                        {...props}>
                         {children}
                       </blockquote>
                     ),
@@ -154,17 +155,12 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                         <code
                           className="bg-gray-100 rounded px-1 py-0.5 text-gray-800 break-words"
                           style={{ fontSize: contentSize }}
-                          {...props}
-                        >
+                          {...props}>
                           {children}
                         </code>
                       ) : (
                         <pre className="block bg-gray-100 rounded p-2 my-2 overflow-x-auto">
-                          <code
-                            className="text-gray-800 break-words"
-                            style={{ fontSize: contentSize }}
-                            {...props}
-                          >
+                          <code className="text-gray-800 break-words" style={{ fontSize: contentSize }} {...props}>
                             {children}
                           </code>
                         </pre>
@@ -174,17 +170,12 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                       <strong
                         className="font-bold text-gray-900 break-words"
                         style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                        {...props}>
                         {children}
                       </strong>
                     ),
                     em: ({ children, ...props }: ComponentProps) => (
-                      <em
-                        className="italic text-gray-900 break-words"
-                        style={{ fontSize: contentSize }}
-                        {...props}
-                      >
+                      <em className="italic text-gray-900 break-words" style={{ fontSize: contentSize }} {...props}>
                         {children}
                       </em>
                     ),

@@ -44,8 +44,8 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-        'Accept': 'text/event-stream',
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        Accept: 'text/event-stream',
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
@@ -79,9 +79,7 @@ export async function POST(req: Request) {
                 accumulatedContent += parsed.choices[0].delta.content;
                 // 发送累积的内容（替换而不是追加）
                 controller.enqueue(
-                  new TextEncoder().encode(
-                    `data: ${JSON.stringify({ content: accumulatedContent })}\n\n`
-                  )
+                  new TextEncoder().encode(`data: ${JSON.stringify({ content: accumulatedContent })}\n\n`)
                 );
               }
             } catch (e) {
@@ -97,18 +95,15 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'X-Accel-Buffering': 'no',
       },
     });
   } catch (error: any) {
     console.error('Error:', error);
-    return new Response(
-      JSON.stringify({ error: '服务器错误，请稍后重试', details: error.message }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ error: '服务器错误，请稍后重试', details: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

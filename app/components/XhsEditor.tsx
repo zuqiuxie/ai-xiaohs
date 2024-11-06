@@ -84,18 +84,18 @@ const XhsEditor = () => {
       const previewElement = cardRef.current;
       const { width } = previewElement.getBoundingClientRect();
 
-      // 1. 创建一个临时容器来克隆预览元素
+      // 1. 创建临时容器
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '-9999px';
       document.body.appendChild(tempContainer);
 
-      // 2. 克隆预览元素到临时容器
+      // 2. 克隆预览元素
       const clone = previewElement.cloneNode(true) as HTMLElement;
       tempContainer.appendChild(clone);
 
-      // 3. 设置克隆元素的样式
+      // 3. 设置克隆元素的基础样式
       clone.style.width = `${width}px`;
       clone.style.height = 'auto';
       clone.style.overflow = 'visible';
@@ -103,21 +103,89 @@ const XhsEditor = () => {
       clone.style.transform = 'none';
       clone.style.position = 'static';
 
-      // 4. 等待内容渲染
+      // 4. 特别处理列表和背景样式
+      const applyStyles = (element: HTMLElement) => {
+        // 处理内容区背景卡片
+        const contentCard = element.querySelector('.bg-white\\/60');
+        if (contentCard instanceof HTMLElement) {
+          contentCard.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+          contentCard.style.backdropFilter = 'blur(8px)';
+          contentCard.style.borderRadius = '0.5rem';
+          contentCard.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+        }
+
+        // 处理有序列表
+        const orderedLists = element.querySelectorAll('ol');
+        orderedLists.forEach(ol => {
+          if (ol instanceof HTMLElement) {
+            ol.style.listStyle = 'none';  // 移除默认序号
+            ol.style.counterReset = 'item';  // 重置计数器
+            ol.style.paddingLeft = '0';
+            ol.style.marginLeft = '0';
+          }
+        });
+
+        // 处理无序列表
+        const unorderedLists = element.querySelectorAll('ul');
+        unorderedLists.forEach(ul => {
+          if (ul instanceof HTMLElement) {
+            ul.style.listStyle = 'none';  // 移除默认圆点
+            ul.style.paddingLeft = '0';
+            ul.style.marginLeft = '0';
+          }
+        });
+
+        // 处理列表项
+        const listItems = element.querySelectorAll('li');
+        listItems.forEach((li, index) => {
+          if (li instanceof HTMLElement) {
+            const isOrderedList = li.parentElement?.tagName.toLowerCase() === 'ol';
+            const isUnorderedList = li.parentElement?.tagName.toLowerCase() === 'ul';
+
+            li.style.position = 'relative';
+            li.style.paddingLeft = '2em';  // 为序号/圆点预留空间
+            li.style.marginBottom = '0.5em';
+            li.style.lineHeight = '1.6';
+            li.style.display = 'block';
+
+            // 创建序号/圆点容器
+            const marker = document.createElement('span');
+            marker.style.position = 'absolute';
+            marker.style.left = '0';
+            marker.style.top = '0';
+            marker.style.width = '1.5em';
+            marker.style.textAlign = 'right';
+            marker.style.paddingRight = '0.5em';
+
+            if (isOrderedList) {
+              marker.textContent = `${index + 1}.`;
+              marker.style.color = '#111827';  // text-gray-900
+            } else if (isUnorderedList) {
+              marker.textContent = '•';
+              marker.style.color = '#111827';  // text-gray-900
+            }
+
+            // 插入序号/圆点到列表项开头
+            li.insertBefore(marker, li.firstChild);
+          }
+        });
+      };
+
+      // 应用样式
+      applyStyles(clone);
+
+      // 5. 等待内容渲染
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // 5. 获取实际内容高度
+      // 6. 获取实际内容高度
       const contentHeight = clone.scrollHeight;
-      // 确保最小高度为宽度的4/3，保持比例
       const minHeight = (width * 4) / 3;
       const exportHeight = Math.max(contentHeight, minHeight);
-
-      // 6. 设置最终导出尺寸
       clone.style.height = `${exportHeight}px`;
 
       // 7. 配置 html2canvas 选项
       const canvas = await html2canvas(clone, {
-        scale: 2, // 提高清晰度
+        scale: 2,
         backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
         logging: false,
         width: width,
@@ -133,6 +201,9 @@ const XhsEditor = () => {
             clonedElement.style.height = `${exportHeight}px`;
             clonedElement.style.overflow = 'visible';
             clonedElement.style.transform = 'none';
+
+            // 在克隆文档中再次应用样式
+            applyStyles(clonedElement);
           }
         },
       });
