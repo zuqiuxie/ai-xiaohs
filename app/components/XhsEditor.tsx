@@ -14,7 +14,7 @@ const defaultSection: Section = {
   content: '',
 };
 
-export type CardType = 'column' | 'text' | 'ai'
+export type CardType = 'column' | 'text' | 'ai';
 
 const XhsEditor = () => {
   const [editorState, setEditorState] = useState<EditorState>({
@@ -118,8 +118,8 @@ const XhsEditor = () => {
         const orderedLists = element.querySelectorAll('ol');
         orderedLists.forEach(ol => {
           if (ol instanceof HTMLElement) {
-            ol.style.listStyle = 'none';  // 移除默认序号
-            ol.style.counterReset = 'item';  // 重置计数器
+            ol.style.listStyle = 'none'; // 移除默认序号
+            ol.style.counterReset = 'item'; // 重置计数器
             ol.style.paddingLeft = '0';
             ol.style.marginLeft = '0';
           }
@@ -129,7 +129,7 @@ const XhsEditor = () => {
         const unorderedLists = element.querySelectorAll('ul');
         unorderedLists.forEach(ul => {
           if (ul instanceof HTMLElement) {
-            ul.style.listStyle = 'none';  // 移除默认圆点
+            ul.style.listStyle = 'none'; // 移除默认圆点
             ul.style.paddingLeft = '0';
             ul.style.marginLeft = '0';
           }
@@ -143,7 +143,7 @@ const XhsEditor = () => {
             const isUnorderedList = li.parentElement?.tagName.toLowerCase() === 'ul';
 
             li.style.position = 'relative';
-            li.style.paddingLeft = '2em';  // 为序号/圆点预留空间
+            li.style.paddingLeft = '2em'; // 为序号/圆点预留空间
             li.style.marginBottom = '0.5em';
             li.style.lineHeight = '1.6';
             li.style.display = 'block';
@@ -159,10 +159,10 @@ const XhsEditor = () => {
 
             if (isOrderedList) {
               marker.textContent = `${index + 1}.`;
-              marker.style.color = '#111827';  // text-gray-900
+              marker.style.color = '#111827'; // text-gray-900
             } else if (isUnorderedList) {
               marker.textContent = '•';
-              marker.style.color = '#111827';  // text-gray-900
+              marker.style.color = '#111827'; // text-gray-900
             }
 
             // 插入序号/圆点到列表项开头
@@ -194,7 +194,7 @@ const XhsEditor = () => {
         windowHeight: exportHeight,
         useCORS: true,
         allowTaint: true,
-        onclone: (clonedDoc) => {
+        onclone: clonedDoc => {
           const clonedElement = clonedDoc.querySelector('[data-card]');
           if (clonedElement instanceof HTMLElement) {
             clonedElement.style.width = `${width}px`;
@@ -338,6 +338,22 @@ const XhsEditor = () => {
   // 在 XhsEditor 组件中添加新的处理函数
   const handleTitleChange = (value: string) => {
     setEditorState(prev => ({ ...prev, title: value }));
+  };
+
+  // 在 XhsEditor 组件中添加处理函数
+  const handleCardContentChange = (content: string) => {
+    const newSections = [
+      {
+        ...defaultSection,
+        id: editorState.sections[0]?.id || uuidv4(),
+        content: content,
+      },
+    ];
+    setEditorState(prev => ({ ...prev, sections: newSections }));
+  };
+
+  const handleCardTitleChange = (title: string) => {
+    setEditorState(prev => ({ ...prev, title }));
   };
 
   return (
@@ -556,7 +572,7 @@ const XhsEditor = () => {
                   {editorState.template === 'ai' && (
                     <AIContentEditor
                       title={editorState.title}
-                      onContentGenerated={(content) => {
+                      onContentGenerated={content => {
                         const newSections = [
                           {
                             ...defaultSection,
@@ -586,6 +602,8 @@ const XhsEditor = () => {
                       font={getFontStyle(editorState.font).fontFamily}
                       fontSize={editorState.fontSize}
                       backgroundColor={editorState.backgroundColor}
+                      onContentChange={handleCardContentChange}
+                      onTitleChange={handleCardTitleChange}
                     />
                   )}
                 </div>
