@@ -12,17 +12,34 @@ interface MarkdownCardProps {
   font: string;
   fontSize: string;
   backgroundColor: string;
-  onContentChange: (content: string) => void;
-  onTitleChange: (title: string) => void;
+  onContentChange?: (content: string) => void;
+  onTitleChange?: (title: string) => void;
+  onDownload?: () => void;
 }
 
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
-  ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange }, ref) => {
+  ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange, onDownload }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
     const contentSize = fontSize;
     const h1Size = `${parseInt(fontSize) + 4}px`;
     const h2Size = `${parseInt(fontSize) + 2}px`;
     const h3Size = `${parseInt(fontSize) + 1}px`;
+
+    const handleCopy = async () => {
+      try {
+        const textToCopy = `${onTitleChange?.(content)}\n\n${content}`;
+        await navigator.clipboard.writeText(textToCopy);
+        setCopyStatus('copied');
+
+        setTimeout(() => {
+          setCopyStatus('idle');
+        }, 3000);
+      } catch (err) {
+        console.error('Failed to copy text:', err);
+        alert('复制失败，请重试');
+      }
+    };
 
     return (
       <div

@@ -324,6 +324,69 @@ const XhsEditor = () => {
     setEditorState(prev => ({ ...prev, title }));
   };
 
+  // 创建一个 Toast 组件函数
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    // 移除已存在的 toast
+    const existingToast = document.getElementById('global-toast');
+    if (existingToast) {
+      document.body.removeChild(existingToast);
+    }
+
+    const toast = document.createElement('div');
+    toast.id = 'global-toast'; // 添加唯一 ID
+    toast.className = `
+      fixed top-6 left-1/2 -translate-x-1/2 z-50
+      px-4 py-2 rounded-lg
+      ${type === 'success' ? 'bg-gray-800/90' : 'bg-red-500/90'} backdrop-blur-sm
+      text-white text-sm font-medium
+      shadow-lg
+      flex items-center gap-2
+      transform transition-all duration-300 ease-out
+      opacity-0 translate-y-[-1rem]
+    `;
+
+    // 设置图标
+    const icon = type === 'success'
+      ? `<svg class="w-4 h-4 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+         </svg>`
+      : `<svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+         </svg>`;
+
+    toast.innerHTML = `${icon}<span>${message}</span>`;
+
+    document.body.appendChild(toast);
+
+    // 使用 requestAnimationFrame 确保 DOM 更新后再添加动画
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translate(-50%, 0)';
+    });
+
+    // 创建一个移除函数
+    const removeToast = () => {
+      const toastElement = document.getElementById('global-toast');
+      if (toastElement && toastElement.parentNode) {
+        toastElement.style.opacity = '0';
+        toastElement.style.transform = 'translate(-50%, -1rem)';
+
+        // 只添加一次事件监听器
+        const handleTransitionEnd = () => {
+          if (toastElement.parentNode) {
+            toastElement.removeEventListener('transitionend', handleTransitionEnd);
+            toastElement.parentNode.removeChild(toastElement);
+          }
+        };
+
+        toastElement.addEventListener('transitionend', handleTransitionEnd);
+      }
+    };
+
+    // 3秒后移除
+    setTimeout(removeToast, 3000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -493,7 +556,8 @@ const XhsEditor = () => {
 
             {/* 右侧预览区 */}
             <div className="w-[380px] flex-shrink-0">
-              <div className="flex flex-col items-start space-y-3">
+              <div className="flex flex-col items-start space-y-4">
+                {/* 预览卡片 */}
                 <div className="relative group">
                   <MarkdownCard
                     ref={cardRef}
@@ -507,19 +571,54 @@ const XhsEditor = () => {
                   />
                 </div>
 
-                <button
-                  onClick={() => handleDownload('png')}
-                  className="w-[360px] px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                    />
-                  </svg>
-                  下载图片
-                </button>
+                {/* 操作按钮区 */}
+                <div className="w-[360px] flex gap-2">
+                  {/* 复制文本按钮 */}
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(editorState.sections[0]?.content || '');
+                        showToast('已复制到剪贴板');
+                      } catch (err) {
+                        console.error('Failed to copy:', err);
+                        showToast('复制失败，请重试', 'error');
+                      }
+                    }}
+                    className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                      />
+                    </svg>
+                    复制文本
+                  </button>
+
+                  {/* 下载图片按钮 */}
+                  <button
+                    onClick={() => handleDownload('png')}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                    下载图片
+                  </button>
+                </div>
               </div>
             </div>
           </div>
