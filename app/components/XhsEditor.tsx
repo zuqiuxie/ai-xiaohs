@@ -56,7 +56,7 @@ const FONT_OPTIONS = {
 
 const XhsEditor = () => {
   const [editorState, setEditorState] = useState<EditorState>({
-    template: 'knowledge',
+    template: 'ai',
     title: '',
     font: '思源黑体',
     fontSize: '16px',
@@ -291,85 +291,6 @@ const XhsEditor = () => {
     };
   };
 
-  // 知识干货模板
-  const KnowledgeCard = () => (
-    <div
-      ref={cardRef}
-      data-card
-      className="w-[360px] h-[480px] overflow-y-auto rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-sm"
-      style={{
-        backgroundColor: editorState.backgroundColor,
-      }}>
-      <div className="p-6 h-full">
-        <h1
-          className="text-xl font-medium mb-6 text-center tracking-tight"
-          style={{
-            fontFamily: getFontStyle(editorState.font).fontFamily,
-            fontSize: parseInt(editorState.fontSize) + 2 + 'px',
-          }}>
-          {editorState.title || '标题'}
-        </h1>
-        <div className="space-y-4">
-          {editorState.sections.map((section, index) => (
-            <div
-              key={section.id}
-              className="rounded-xl p-4 transition-all duration-200"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)' }}>
-              <h2
-                className="text-base font-medium tracking-tight mb-2"
-                style={{
-                  fontFamily: getFontStyle(editorState.font).fontFamily,
-                  fontSize: editorState.fontSize,
-                }}>
-                {section.title || `小节 ${index + 1}`}
-              </h2>
-              <p
-                className="text-gray-600 whitespace-pre-wrap text-sm leading-relaxed pl-2.5 min-h-[2.5em]"
-                style={{
-                  fontFamily: getFontStyle(editorState.font).fontFamily,
-                  fontSize: editorState.fontSize,
-                }}>
-                {section.content || '内容描述...'}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  // 个人思考模板
-  const ThinkingCard = () => (
-    <div
-      ref={cardRef}
-      data-card
-      className="w-[360px] h-[480px] overflow-y-auto rounded-xl shadow-lg"
-      style={{
-        backgroundColor: editorState.backgroundColor,
-      }}>
-      <div className="p-6 h-full flex flex-col">
-        <h1
-          className="text-lg font-bold mb-6 text-center"
-          style={{
-            fontFamily: getFontStyle(editorState.font).fontFamily,
-            fontSize: parseInt(editorState.fontSize) + 2 + 'px',
-          }}>
-          {editorState.title || '标题'}
-        </h1>
-        <div
-          className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm flex-1"
-          style={{
-            fontFamily: getFontStyle(editorState.font).fontFamily,
-            fontSize: editorState.fontSize,
-          }}>
-          <div className="text-gray-700 whitespace-pre-wrap min-h-[2.5em]" style={{ lineHeight: '1.8' }}>
-            {editorState.sections[0]?.content || '输入内容...'}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   // 在样式改变时记录
   const handleStyleChange = (type: 'font' | 'fontSize' | 'backgroundColor', value: string) => {
     setEditorState(prev => ({ ...prev, [type]: value }));
@@ -410,7 +331,7 @@ const XhsEditor = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-3">
             小红书
             <span className="bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 text-transparent bg-clip-text">
-              图文卡片
+              AI卡片
             </span>
             生成器
           </h1>
@@ -419,45 +340,14 @@ const XhsEditor = () => {
           </p>
         </div>
 
-        {/* 主要内容区 - 移除卡片样式，减小内边距和间距 */}
+        {/* 主要内容区 */}
         <div className="mt-4">
-          {/* 模板选择区 - 减小上下间距 */}
-          <div className="mb-3">
-            <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
-              <button
-                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
-                  editorState.template === 'knowledge'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                onClick={() => handleTemplateChange('knowledge')}>
-                分栏卡片
-              </button>
-              <button
-                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
-                  editorState.template === 'thinking'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                onClick={() => handleTemplateChange('thinking')}>
-                纯文本卡片
-              </button>
-              <button
-                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
-                  editorState.template === 'ai'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                onClick={() => handleTemplateChange('ai')}>
-                AI卡片
-              </button>
-            </div>
-          </div>
+          {/* 移除模板选择区 */}
 
           <div className="flex gap-8 h-[calc(100vh-220px)]">
-            {/* 左侧编辑区 - 添加固定度和滚动控制 */}
+            {/* 左侧编辑区 */}
             <div className="flex-1 max-w-2xl flex flex-col">
-              {/* 样式设置区 - 设为 flex-shrink-0 防止压缩 */}
+              {/* 样式设置区 */}
               <div className="bg-white/60 rounded-lg p-3 mb-3 flex-shrink-0">
                 <h3 className="text-xs font-medium text-gray-900 mb-2">样式设置</h3>
                 <div className="space-y-3">
@@ -531,11 +421,10 @@ const XhsEditor = () => {
                 </div>
               </div>
 
-              {/* 内容编辑区 - 添加 flex-1 和 overflow-auto */}
+              {/* 内容编辑区 */}
               <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
                 <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
                 <div className="space-y-4">
-                  {/* 移除条件判断，始终显示标题输入 */}
                   <div>
                     <label className="block text-xs text-gray-500 mb-2">标题</label>
                     <input
@@ -547,114 +436,38 @@ const XhsEditor = () => {
                     />
                   </div>
 
-                  {editorState.template === 'knowledge' && (
-                    <div className="space-y-4" ref={contentEditRef}>
-                      {editorState.sections.map((section, index) => (
-                        <div key={section.id} className="bg-white rounded-lg p-4 shadow-sm">
-                          <div className="flex items-center gap-3 mb-3">
-                            <input
-                              type="text"
-                              value={section.title}
-                              onChange={e => {
-                                const newSections = [...editorState.sections];
-                                newSections[index].title = e.target.value;
-                                setEditorState(prev => ({ ...prev, sections: newSections }));
-                              }}
-                              placeholder={`小节标题 ${index + 1}`}
-                              className="flex-1 px-3 py-2 bg-transparent border-b border-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
-                            />
-                            {editorState.sections.length > 1 && (
-                              <button
-                                onClick={() => handleRemoveSection(section.id)}
-                                className="text-sm text-gray-400 hover:text-red-500 transition-colors">
-                                删除
-                              </button>
-                            )}
-                          </div>
-                          <textarea
-                            value={section.content}
-                            onChange={e => {
-                              const newSections = [...editorState.sections];
-                              newSections[index].content = e.target.value;
-                              setEditorState(prev => ({ ...prev, sections: newSections }));
-                            }}
-                            placeholder="请输入内容"
-                            className="w-full px-3 py-2 bg-gray-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[100px] resize-none"
-                          />
-                        </div>
-                      ))}
-                      {editorState.sections.length < 5 && (
-                        <button
-                          onClick={handleAddSection}
-                          className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors text-sm">
-                          + 添加小节
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {editorState.template === 'thinking' && (
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                      <textarea
-                        value={editorState.sections[0]?.content || ''}
-                        onChange={e => {
-                          const newSections = [
-                            {
-                              ...defaultSection,
-                              id: editorState.sections[0]?.id || uuidv4(),
-                              content: e.target.value,
-                            },
-                          ];
-                          setEditorState(prev => ({ ...prev, sections: newSections }));
-                        }}
-                        placeholder="请输入内容..."
-                        className="w-full px-3 py-2 bg-gray-50/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[300px] resize-none"
-                        style={{
-                          fontFamily: editorState.font,
-                          fontSize: editorState.fontSize,
-                          lineHeight: '1.8',
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {editorState.template === 'ai' && (
-                    <AIContentEditor
-                      title={editorState.title}
-                      onContentGenerated={content => {
-                        const newSections = [
-                          {
-                            ...defaultSection,
-                            id: editorState.sections[0]?.id || uuidv4(),
-                            content: content,
-                          },
-                        ];
-                        setEditorState(prev => ({ ...prev, sections: newSections }));
-                      }}
-                    />
-                  )}
+                  {/* AI 卡片编辑器 */}
+                  <AIContentEditor
+                    title={editorState.title}
+                    onContentGenerated={content => {
+                      const newSections = [
+                        {
+                          ...defaultSection,
+                          id: editorState.sections[0]?.id || uuidv4(),
+                          content: content,
+                        },
+                      ];
+                      setEditorState(prev => ({ ...prev, sections: newSections }));
+                    }}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* 右侧预览区 - 保持不变 */}
+            {/* 右侧预览区 */}
             <div className="w-[380px] flex-shrink-0">
               <div className="flex flex-col items-start space-y-3">
                 <div className="relative group">
-                  {editorState.template === 'knowledge' && <KnowledgeCard />}
-                  {editorState.template === 'thinking' && <ThinkingCard />}
-                  {editorState.template === 'ai' && (
-                    <MarkdownCard
-                      ref={cardRef}
-                      title={editorState.title}
-                      content={editorState.sections[0]?.content || ''}
-                      font={getFontStyle(editorState.font).fontFamily}
-                      fontSize={editorState.fontSize}
-                      backgroundColor={editorState.backgroundColor}
-                      onContentChange={handleCardContentChange}
-                      onTitleChange={handleCardTitleChange}
-                    />
-                  )}
+                  <MarkdownCard
+                    ref={cardRef}
+                    title={editorState.title}
+                    content={editorState.sections[0]?.content || ''}
+                    font={getFontStyle(editorState.font).fontFamily}
+                    fontSize={editorState.fontSize}
+                    backgroundColor={editorState.backgroundColor}
+                    onContentChange={handleCardContentChange}
+                    onTitleChange={handleCardTitleChange}
+                  />
                 </div>
 
                 <button
