@@ -387,6 +387,45 @@ const XhsEditor = () => {
     setTimeout(removeToast, 3000);
   };
 
+  // 添加一个辅助函数来转换 Markdown 为纯文本
+  const convertMarkdownToPlainText = (markdown: string): string => {
+    let text = markdown;
+
+    // 处理标题
+    text = text.replace(/^#\s+(.*)$/m, '$1\n');
+    text = text.replace(/^##\s+(.*)$/gm, '$1\n');
+    text = text.replace(/^###\s+(.*)$/gm, '$1\n');
+
+    // 处理列表
+    text = text.replace(/^\d+\.\s+(.*)$/gm, '$1');  // 有序列表
+    text = text.replace(/^[-*]\s+(.*)$/gm, '$1');   // 无序列表
+
+    // 处理强调语法
+    text = text.replace(/\*\*(.*?)\*\*/g, '$1');    // 粗体
+    text = text.replace(/__(.*?)__/g, '$1');        // 粗体替代语法
+    text = text.replace(/\*(.*?)\*/g, '$1');        // 斜体
+    text = text.replace(/_(.*?)_/g, '$1');          // 斜体替代语法
+
+    // 处理链接和图片
+    text = text.replace(/!\[(.*?)\]\(.*?\)/g, '$1'); // 图片
+    text = text.replace(/\[(.*?)\]\(.*?\)/g, '$1');  // 链接
+
+    // 处理代码块和行内代码
+    text = text.replace(/```[\s\S]*?```/g, '');     // 代码块
+    text = text.replace(/`([^`]+)`/g, '$1');        // 行内代码
+
+    // 处理引用
+    text = text.replace(/^>\s*(.*?)$/gm, '$1');
+
+    // 处理水平线
+    text = text.replace(/^[-*_]{3,}$/gm, '\n');
+
+    // 处理多余的空行
+    text = text.replace(/\n{3,}/g, '\n\n');
+
+    return text.trim();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -416,7 +455,7 @@ const XhsEditor = () => {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
                 onClick={() => handleTemplateChange('ai')}>
-                AI卡片
+                主题生成
               </button>
               <button
                 className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
@@ -463,7 +502,7 @@ const XhsEditor = () => {
                         className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
                         <option value="12px">12px - 小号</option>
                         <option value="14px">14px - 正常</option>
-                        <option value="15px">15px - 中等</option>
+                        <option value="15px">15px - 中</option>
                         <option value="16px">16px - 偏大</option>
                         <option value="18px">18px - 大号</option>
                         <option value="20px">20px - 特大</option>
@@ -576,8 +615,15 @@ const XhsEditor = () => {
                   {/* 复制文本按钮 */}
                   <button
                     onClick={async () => {
+                      const content = editorState.sections[0]?.content || '';
+                      if (!content.trim()) {
+                        showToast('暂无内容可复制', 'error');
+                        return;
+                      }
+
                       try {
-                        await navigator.clipboard.writeText(editorState.sections[0]?.content || '');
+                        const plainText = convertMarkdownToPlainText(content);
+                        await navigator.clipboard.writeText(plainText);
                         showToast('已复制到剪贴板');
                       } catch (err) {
                         console.error('Failed to copy:', err);
@@ -605,7 +651,14 @@ const XhsEditor = () => {
 
                   {/* 下载图片按钮 */}
                   <button
-                    onClick={() => handleDownload('png')}
+                    onClick={() => {
+                      const content = editorState.sections[0]?.content || '';
+                      if (!content.trim()) {
+                        showToast('暂无内容可下载', 'error');
+                        return;
+                      }
+                      handleDownload('png');
+                    }}
                     className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
