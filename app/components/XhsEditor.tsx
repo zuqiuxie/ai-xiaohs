@@ -163,6 +163,77 @@ const XhsEditor = () => {
         }
       });
 
+      // 特别处理有序列表
+      const orderedLists = clone.querySelectorAll('ol');
+      orderedLists.forEach(list => {
+        if (list instanceof HTMLElement) {
+          list.style.listStyle = 'decimal';
+          list.style.paddingLeft = '0';
+          list.style.margin = '0';
+
+          // 处理列表项
+          const items = list.querySelectorAll('li');
+          items.forEach((item, index) => {
+            if (item instanceof HTMLElement) {
+              // 设置列表项样式
+              item.style.display = 'block';
+              item.style.position = 'relative';
+              item.style.paddingLeft = '2em';
+              item.style.marginBottom = '0.75em';
+
+              // 创建序号元素
+              const number = document.createElement('span');
+              number.textContent = `${index + 1}.`;
+              number.style.position = 'absolute';
+              number.style.left = '0';
+              number.style.top = '0';
+              number.style.fontFamily = getFontStyle(editorState.font).fontFamily;
+              number.style.fontSize = editorState.fontSize;
+              number.style.lineHeight = '1.6';
+              number.style.minWidth = '1.5em';
+
+              // 插入序号到列表项开头
+              item.insertBefore(number, item.firstChild);
+            }
+          });
+        }
+      });
+
+      // 特别处理无序列表
+      const unorderedLists = clone.querySelectorAll('ul');
+      unorderedLists.forEach(list => {
+        if (list instanceof HTMLElement) {
+          list.style.listStyle = 'none';
+          list.style.paddingLeft = '0';
+          list.style.margin = '0';
+
+          // 处理列表项
+          const items = list.querySelectorAll('li');
+          items.forEach(item => {
+            if (item instanceof HTMLElement) {
+              // 设置列表项样式
+              item.style.display = 'block';
+              item.style.position = 'relative';
+              item.style.paddingLeft = '2em';
+              item.style.marginBottom = '0.75em';
+
+              // 创建圆点元素
+              const bullet = document.createElement('span');
+              bullet.textContent = '•';
+              bullet.style.position = 'absolute';
+              bullet.style.left = '0.5em';
+              bullet.style.top = '0';
+              bullet.style.fontFamily = getFontStyle(editorState.font).fontFamily;
+              bullet.style.fontSize = editorState.fontSize;
+              bullet.style.lineHeight = '1.6';
+
+              // 插入圆点到列表项开头
+              item.insertBefore(bullet, item.firstChild);
+            }
+          });
+        }
+      });
+
       // 6. 等待样式应用
       await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -384,7 +455,7 @@ const XhsEditor = () => {
           </div>
 
           <div className="flex gap-8 h-[calc(100vh-220px)]">
-            {/* 左侧编辑区 - 添加固定高度和滚动控制 */}
+            {/* 左侧编辑区 - 添加固定度和滚动控制 */}
             <div className="flex-1 max-w-2xl flex flex-col">
               {/* 样式设置区 - 设为 flex-shrink-0 防止压缩 */}
               <div className="bg-white/60 rounded-lg p-3 mb-3 flex-shrink-0">
@@ -429,7 +500,7 @@ const XhsEditor = () => {
                     <div className="flex flex-wrap gap-2">
                       {[
                         { color: '#E6F7F3', name: '薄荷绿' },
-                        { color: '#F3E6FF', name: '梦幻紫' },
+                        { color: '#F3E6FF', name: '梦紫' },
                         { color: '#FFF3E6', name: '暖阳橙' },
                         { color: '#E6F0FF', name: '天空蓝' },
                         { color: '#FFE6E6', name: '樱花粉' },
