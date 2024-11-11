@@ -12,12 +12,23 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
   const [keywords, setKeywords] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [contentStyle, setContentStyle] = useState('轻松活泼');
 
   const { trackEvent } = useAnalytics();
 
   const handleGenerate = async () => {
     if (!originalText || !keywords) {
-      alert('请输入原文和关键词');
+      showToast('请填写原文和关键词', 'error');
+      return;
+    }
+
+    if (originalText.length < 50) {
+      showToast('原文内容太短，建议提供更详细的参考内容', 'error');
+      return;
+    }
+
+    if (keywords.split(',').length > 3) {
+      showToast('关键词不要超过3个，以确保内容聚焦', 'error');
       return;
     }
 
@@ -80,7 +91,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
 
     } catch (error) {
       console.error('生成失败:', error);
-      alert(error instanceof Error ? error.message : '生成失败，请重试');
+      showToast(error instanceof Error ? error.message : '生成失败，请重试', 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -90,42 +101,77 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
     <div className="space-y-4">
       <div>
         <label className="block text-xs text-gray-500 mb-2">原文参考</label>
-        <textarea
-          value={originalText}
-          onChange={e => setOriginalText(e.target.value)}
-          placeholder="请输入要参考的爆款文案原文"
-          className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[120px] resize-none"
-        />
+        <div className="space-y-2">
+          <textarea
+            value={originalText}
+            onChange={e => setOriginalText(e.target.value)}
+            placeholder="粘贴你想参考的爆款笔记内容..."
+            className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[120px] resize-none"
+          />
+          <div className="text-xs text-gray-500">
+            提示：建议选择与你主题相关、互动数据好的爆款笔记作为参考
+          </div>
+        </div>
       </div>
 
       <div>
-        <label className="block text-xs text-gray-500 mb-2">笔记关键词</label>
-        <input
-          type="text"
-          value={keywords}
-          onChange={e => setKeywords(e.target.value)}
-          placeholder="例如：产品名，产品类型等"
-          className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-        />
+        <label className="block text-xs text-gray-500 mb-2">核心关键词</label>
+        <div className="space-y-2">
+          <input
+            type="text"
+            value={keywords}
+            onChange={e => setKeywords(e.target.value)}
+            placeholder="输入2-3个核心关键词，用逗号分隔"
+            className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+          />
+          <div className="text-xs text-gray-500">
+            示例：减肥食谱, 低卡, 健康 | 遛娃攻略, 亲子互动, 教育
+          </div>
+        </div>
       </div>
 
       <div>
-        <label className="block text-xs text-gray-500 mb-2">笔记相关信息（可选）</label>
-        <textarea
-          value={additionalInfo}
-          onChange={e => setAdditionalInfo(e.target.value)}
-          placeholder="希望强调的产品优势、产品亮点等"
-          className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[100px] resize-none"
-        />
+        <label className="block text-xs text-gray-500 mb-2">内容风格</label>
+        <div className="grid grid-cols-3 gap-2">
+          {['轻松活泼', '专业严谨', '感性温暖'].map(style => (
+            <button
+              key={style}
+              onClick={() => setContentStyle(style)}
+              className={`px-3 py-2 rounded-lg text-sm transition-all ${
+                contentStyle === style
+                  ? 'bg-blue-50 text-blue-600 border-blue-200'
+                  : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+              } border`}
+            >
+              {style}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-gray-500 mb-2">补充信息（选填）</label>
+        <div className="space-y-2">
+          <textarea
+            value={additionalInfo}
+            onChange={e => setAdditionalInfo(e.target.value)}
+            placeholder="添加一些独特的观点、个人经验或数据..."
+            className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[100px] resize-none"
+          />
+          <div className="text-xs text-gray-500">
+            提示：添加具体的案例、数据或个人经验可以提高内容的可信度和价值
+          </div>
+        </div>
       </div>
 
       <button
         onClick={handleGenerate}
         disabled={isGenerating}
-        className="w-full px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+      >
         {isGenerating ? (
           <>
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
               <circle
                 className="opacity-25"
                 cx="12"
@@ -145,15 +191,10 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
           </>
         ) : (
           <>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            一键生成
+            开始生成
           </>
         )}
       </button>
