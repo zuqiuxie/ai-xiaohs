@@ -25,7 +25,7 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
     });
 
     try {
-      const response = await fetch('/api/generate/stream', {
+      const response = await fetch('/api/generate/ai-card', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

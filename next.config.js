@@ -13,6 +13,9 @@ const nextConfig = {
     return config;
   },
   poweredByHeader: false,
+  experimental: {
+    serverActions: true,
+  },
 }
 
 module.exports = nextConfig

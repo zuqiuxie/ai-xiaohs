@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 import AIContentEditor from './AIContentEditor';
 import MarkdownCard from './MarkdownCard';
 import { useAnalytics } from '../hooks/useAnalytics';
+import HotPostEditor from './HotPostEditor';
 
 const defaultSection: Section = {
   id: uuidv4(),
@@ -342,7 +343,29 @@ const XhsEditor = () => {
 
         {/* 主要内容区 */}
         <div className="mt-4">
-          {/* 移除模板选择区 */}
+          {/* 添加模板选择区 */}
+          <div className="mb-3">
+            <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
+              <button
+                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  editorState.template === 'ai'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => handleTemplateChange('ai')}>
+                AI卡片
+              </button>
+              <button
+                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  editorState.template === 'hot_post'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={() => handleTemplateChange('hot_post')}>
+                爆款跟写
+              </button>
+            </div>
+          </div>
 
           <div className="flex gap-8 h-[calc(100vh-220px)]">
             {/* 左侧编辑区 */}
@@ -436,20 +459,34 @@ const XhsEditor = () => {
                     />
                   </div>
 
-                  {/* AI 卡片编辑器 */}
-                  <AIContentEditor
-                    title={editorState.title}
-                    onContentGenerated={content => {
-                      const newSections = [
-                        {
-                          ...defaultSection,
-                          id: editorState.sections[0]?.id || uuidv4(),
-                          content: content,
-                        },
-                      ];
-                      setEditorState(prev => ({ ...prev, sections: newSections }));
-                    }}
-                  />
+                  {editorState.template === 'ai' ? (
+                    <AIContentEditor
+                      title={editorState.title}
+                      onContentGenerated={content => {
+                        const newSections = [
+                          {
+                            ...defaultSection,
+                            id: editorState.sections[0]?.id || uuidv4(),
+                            content: content,
+                          },
+                        ];
+                        setEditorState(prev => ({ ...prev, sections: newSections }));
+                      }}
+                    />
+                  ) : (
+                    <HotPostEditor
+                      onContentGenerated={content => {
+                        const newSections = [
+                          {
+                            ...defaultSection,
+                            id: editorState.sections[0]?.id || uuidv4(),
+                            content: content,
+                          },
+                        ];
+                        setEditorState(prev => ({ ...prev, sections: newSections }));
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
