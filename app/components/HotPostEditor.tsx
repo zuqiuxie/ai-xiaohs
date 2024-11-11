@@ -43,6 +43,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
         body: JSON.stringify({
           originalText,
           keywords,
+          contentStyle,
           additionalInfo,
         }),
       });
