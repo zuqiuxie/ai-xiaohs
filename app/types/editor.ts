@@ -1,4 +1,4 @@
-export type TemplateType = 'knowledge' | 'thinking' | 'ai';
+export type TemplateType = 'ai' | 'hot_post';
 
 export interface Section {
   id: string

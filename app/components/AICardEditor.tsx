@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { showToast } from '@/app/utils/toast';
 
 export default function AICardEditor() {
   const [prompt, setPrompt] = useState('')
@@ -22,6 +23,7 @@ export default function AICardEditor() {
       setContent(data.content)
     } catch (error) {
       console.error('Failed to generate content:', error)
+      showToast('生成内容失败', 'error');
     } finally {
       setIsLoading(false)
     }

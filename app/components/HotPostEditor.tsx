@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { showToast } from '@/app/utils/toast';
 
 interface HotPostEditorProps {
   onContentGenerated: (content: string) => void;
@@ -85,9 +86,9 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
         reader.releaseLock();
       }
 
-      trackEvent('generate_hot_post', {
-        timestamp: new Date().toISOString(),
-      });
+      // trackEvent('generate_hot_post', {
+      //   timestamp: new Date().toISOString(),
+      // });
 
     } catch (error) {
       console.error('生成失败:', error);
