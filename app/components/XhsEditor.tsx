@@ -418,7 +418,7 @@ const XhsEditor = () => {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
                 onClick={() => handleTemplateChange('hot_post')}>
-                爆款跟写
+                爆款仿写
               </button>
             </div>
           </div>

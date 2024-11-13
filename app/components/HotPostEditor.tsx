@@ -18,8 +18,11 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
   const { trackEvent } = useAnalytics();
 
   const handleGenerate = async () => {
-    if (!originalText || !keywords) {
-      showToast('请填写原文和关键词', 'error');
+    const titleInput = document.querySelector('input[type="text"][placeholder="输入标题"]') as HTMLInputElement;
+    const title = titleInput?.value || '';
+
+    if (!title || !originalText) {
+      showToast('请填写标题和参考原文', 'error');
       return;
     }
 
@@ -28,7 +31,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
       return;
     }
 
-    if (keywords.split(',').length > 3) {
+    if (keywords && keywords.split(',').length > 3) {
       showToast('关键词不要超过3个，以确保内容聚焦', 'error');
       return;
     }
@@ -41,9 +44,10 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          title,
           originalText,
           keywords,
-          contentStyle,
+          style: contentStyle,
           additionalInfo,
         }),
       });
@@ -87,10 +91,6 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
         reader.releaseLock();
       }
 
-      // trackEvent('generate_hot_post', {
-      //   timestamp: new Date().toISOString(),
-      // });
-
     } catch (error) {
       console.error('生成失败:', error);
       showToast(error instanceof Error ? error.message : '生成失败，请重试', 'error');
@@ -117,7 +117,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
       </div>
 
       <div>
-        <label className="block text-xs text-gray-500 mb-2">核心关键词</label>
+        <label className="block text-xs text-gray-500 mb-2">核心关键词（选填）</label>
         <div className="space-y-2">
           <input
             type="text"
