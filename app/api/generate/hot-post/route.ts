@@ -107,17 +107,30 @@ ${additionalInfo ? `补充信息：${additionalInfo}` : ''}
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(5).trim();
-            if (data === '[DONE]') continue;
+            if (data === '[DONE]') {
+              // 确保发送最后累积的完整内容
+              if (accumulatedContent) {
+                controller.enqueue(
+                  new TextEncoder().encode(`data: ${JSON.stringify({
+                    content: accumulatedContent,
+                    done: true
+                  })}\n\n`)
+                );
+              }
+              continue;
+            }
 
             try {
               const parsed = JSON.parse(data);
               if (parsed.choices?.[0]?.delta?.content) {
                 // 累积内容
                 accumulatedContent += parsed.choices[0].delta.content;
-
-                // 发送完整的累积内容（替换而不是追加）
+                // 发送累积的内容
                 controller.enqueue(
-                  new TextEncoder().encode(`data: ${JSON.stringify({ content: accumulatedContent })}\n\n`)
+                  new TextEncoder().encode(`data: ${JSON.stringify({
+                    content: accumulatedContent,
+                    done: false
+                  })}\n\n`)
                 );
               }
             } catch (e) {
@@ -127,16 +140,35 @@ ${additionalInfo ? `补充信息：${additionalInfo}` : ''}
           }
         }
       },
+      flush(controller) {
+        // 确保在流结束时发送所有剩余内容
+        if (accumulatedContent) {
+          controller.enqueue(
+            new TextEncoder().encode(`data: ${JSON.stringify({
+              content: accumulatedContent,
+              done: true
+            })}\n\n`)
+          );
+        }
+      }
     });
 
-    return new Response(response.body?.pipeThrough(transform), {
+    // 调整响应配置
+    const responseInit = {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         Connection: 'keep-alive',
         'X-Accel-Buffering': 'no',
       },
-    });
+    };
+
+    // 确保响应体存在
+    if (!response.body) {
+      throw new Error('Response body is null');
+    }
+
+    return new Response(response.body.pipeThrough(transform), responseInit);
   } catch (error: any) {
     console.error('Error:', error);
     return new Response(JSON.stringify({ error: '服务器错误，请稍后重试', details: error.message }), {
