@@ -76,7 +76,7 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
         model: 'deepseek-chat',
         messages: messages,
         temperature: 0.75, // 适当提高创造性
-        max_tokens: 1500, // 确保内容完整
+        max_tokens: 3000, // 确保内容完整
         stream: true,
         presence_penalty: 0.4, // 增加新内容的倾向
         frequency_penalty: 0.4, // 减少重复内容
@@ -102,10 +102,12 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
               // 确保发送最后累积的完整内容
               if (accumulatedContent) {
                 controller.enqueue(
-                  new TextEncoder().encode(`data: ${JSON.stringify({
-                    content: accumulatedContent,
-                    done: true
-                  })}\n\n`)
+                  new TextEncoder().encode(
+                    `data: ${JSON.stringify({
+                      content: accumulatedContent,
+                      done: true,
+                    })}\n\n`
+                  )
                 );
               }
               continue;
@@ -118,10 +120,12 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
                 accumulatedContent += parsed.choices[0].delta.content;
                 // 发送累积的内容
                 controller.enqueue(
-                  new TextEncoder().encode(`data: ${JSON.stringify({
-                    content: accumulatedContent,
-                    done: false
-                  })}\n\n`)
+                  new TextEncoder().encode(
+                    `data: ${JSON.stringify({
+                      content: accumulatedContent,
+                      done: false,
+                    })}\n\n`
+                  )
                 );
               }
             } catch (e) {
@@ -135,13 +139,15 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
         // 确保在流结束时发送所有剩余内容
         if (accumulatedContent) {
           controller.enqueue(
-            new TextEncoder().encode(`data: ${JSON.stringify({
-              content: accumulatedContent,
-              done: true
-            })}\n\n`)
+            new TextEncoder().encode(
+              `data: ${JSON.stringify({
+                content: accumulatedContent,
+                done: true,
+              })}\n\n`
+            )
           );
         }
-      }
+      },
     });
 
     // 调整响应配置
