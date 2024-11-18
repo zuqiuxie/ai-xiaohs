@@ -3,9 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   experimental: {
-    appDir: true,
-    runtime: 'edge',
-  },
+    appDir: true
+  }
 }
 
 module.exports = nextConfig
