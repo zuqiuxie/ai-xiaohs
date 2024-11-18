@@ -44,6 +44,7 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
+      let buffer = ''
 
       if (!reader) {
         throw new Error('No reader available')
@@ -55,22 +56,29 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
           if (done) break
 
           const chunk = decoder.decode(value)
-          console.log('Received chunk:', chunk)
+          buffer += chunk
 
-          const lines = chunk.split('\n')
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || ''
 
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(5))
+                console.log('Parsed data:', data)
+
                 if (data.content && data.content.trim()) {
                   accumulatedContent = data.content
-                  console.log('Updated content:', accumulatedContent)
-                  onContentGenerated(accumulatedContent)
+                  console.log('Updating content:', accumulatedContent)
+                  await new Promise<void>((resolve) => {
+                    onContentGenerated(accumulatedContent)
+                    resolve()
+                  })
                 }
+
                 if (data.done) {
-                  console.log('Stream completed, final content:', accumulatedContent)
-                  break
+                  console.log('Stream completed with content:', accumulatedContent)
+                  continue
                 }
               } catch (e) {
                 console.error('Error parsing chunk:', e, 'Line:', line)
@@ -78,6 +86,22 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
             }
           }
         }
+
+        if (buffer.length > 0) {
+          try {
+            const line = buffer.trim()
+            if (line.startsWith('data: ')) {
+              const data = JSON.parse(line.slice(5))
+              if (data.content && data.content.trim()) {
+                accumulatedContent = data.content
+                onContentGenerated(accumulatedContent)
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing final buffer:', e)
+          }
+        }
+
       } finally {
         reader.releaseLock()
       }
