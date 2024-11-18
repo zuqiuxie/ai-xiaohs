@@ -1,33 +1,41 @@
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+export const runtime = 'edge'
+
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'
 
 export async function POST(req: Request) {
   if (!DEEPSEEK_API_KEY) {
-    return new Response(JSON.stringify({ error: 'API key is not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: 'API key is not configured' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
   }
 
   try {
-    const { originalText, title, keywords, style, additionalInfo } = await req.json();
+    const { originalText, title, keywords, style, additionalInfo } = await req.json()
 
     // 验证必要参数
     if (!originalText || !title || !keywords) {
-      return new Response(JSON.stringify({ error: 'Missing required parameters' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Missing required parameters' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
     }
 
-    // 构建消息数组
+    // 保持原有的消息结构
     const messages = [
       {
         role: 'system',
         content: `作为小红书爆款写手，请创作一篇超吸引的干货笔记！
 
 关键点：
-1. 标题（12字内）：
+1. 标题（16字内）：
    - 基于"${title}"改写
    - 开头/结尾加emoji
    - 制造好奇/痛点
@@ -63,114 +71,109 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
 3. 确保干货实用
 4. 适合小红书排版`,
       },
-    ];
+    ]
 
     const response = await fetch(DEEPSEEK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-        Accept: 'text/event-stream',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
-        messages: messages,
-        temperature: 0.75, // 适当提高创造性
-        max_tokens: 3000, // 确保内容完整
+        messages,
+        temperature: 0.75,
+        max_tokens: 3000,
         stream: true,
-        presence_penalty: 0.4, // 增加新内容的倾向
-        frequency_penalty: 0.4, // 减少重复内容
-        top_p: 0.9, // 保持输出的多样性
+        presence_penalty: 0.4,
+        frequency_penalty: 0.4,
+        top_p: 0.9,
       }),
-    });
+    })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`Deepseek API error: ${response.status}`)
     }
 
-    // 创建一个 TransformStream 来处理数据
-    let accumulatedContent = '';
-    const transform = new TransformStream({
-      async transform(chunk, controller) {
-        const text = new TextDecoder().decode(chunk);
-        const lines = text.split('\n');
+    // 使用 ReadableStream 处理流式响应
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = response.body?.getReader()
+        if (!reader) {
+          controller.close()
+          return
+        }
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(5).trim();
-            if (data === '[DONE]') {
-              // 确保发送最后累积的完整内容
-              if (accumulatedContent) {
-                controller.enqueue(
-                  new TextEncoder().encode(
-                    `data: ${JSON.stringify({
-                      content: accumulatedContent,
-                      done: true,
-                    })}\n\n`
-                  )
-                );
-              }
-              continue;
-            }
+        let accumulatedContent = ''
+        const decoder = new TextDecoder()
 
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.choices?.[0]?.delta?.content) {
-                // 累积内容
-                accumulatedContent += parsed.choices[0].delta.content;
-                // 发送累积的内容
-                controller.enqueue(
-                  new TextEncoder().encode(
-                    `data: ${JSON.stringify({
-                      content: accumulatedContent,
-                      done: false,
-                    })}\n\n`
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            const chunk = decoder.decode(value)
+            const lines = chunk.split('\n')
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(5).trim()
+                if (data === '[DONE]') {
+                  controller.enqueue(
+                    `data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`
                   )
-                );
+                  continue
+                }
+
+                try {
+                  const parsed = JSON.parse(data)
+                  if (parsed.choices?.[0]?.delta?.content) {
+                    accumulatedContent += parsed.choices[0].delta.content
+                    controller.enqueue(
+                      `data: ${JSON.stringify({
+                        content: accumulatedContent,
+                        done: false
+                      })}\n\n`
+                    )
+                  }
+                } catch (e) {
+                  console.error('Parse error:', e)
+                  continue
+                }
               }
-            } catch (e) {
-              console.error('Parse error:', e);
-              continue;
             }
           }
+        } catch (error) {
+          console.error('Stream error:', error)
+          controller.error(error)
+        } finally {
+          reader.releaseLock()
+          controller.close()
         }
-      },
-      flush(controller) {
-        // 确保在流结束时发送所有剩余内容
-        if (accumulatedContent) {
-          controller.enqueue(
-            new TextEncoder().encode(
-              `data: ${JSON.stringify({
-                content: accumulatedContent,
-                done: true,
-              })}\n\n`
-            )
-          );
-        }
-      },
-    });
+      }
+    })
 
-    // 调整响应配置
-    const responseInit = {
+    return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
-        Connection: 'keep-alive',
+        'Connection': 'keep-alive',
         'X-Accel-Buffering': 'no',
-      },
-    };
+        'X-Edge-Function': 'true'
+      }
+    })
 
-    // 确保响应体存在
-    if (!response.body) {
-      throw new Error('Response body is null');
-    }
-
-    return new Response(response.body.pipeThrough(transform), responseInit);
-  } catch (error: any) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: '服务器错误，请稍后重试', details: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  } catch (error) {
+    console.error('Generation error:', error)
+    return new Response(
+      JSON.stringify({
+        error: '生成失败，请重试',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
   }
 }
