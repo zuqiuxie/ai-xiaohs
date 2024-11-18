@@ -18,7 +18,10 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
     setError(null)
     let accumulatedContent = ''
 
+    console.log('Starting content generation...')
+
     try {
+      console.log('Sending request to API...')
       const response = await fetch('/api/generate/ai-card', {
         method: 'POST',
         headers: {
@@ -38,30 +41,44 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         })
       })
 
+      console.log('Response received:', response.status)
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
+      console.log('Reader created:', !!reader)
 
       if (!reader) {
         throw new Error('No reader available')
       }
 
+      const decoder = new TextDecoder()
+      let buffer = ''
+
       try {
-        while (true) {
+        let retryCount = 0
+        const maxRetries = 3
+
+        while (retryCount < maxRetries) {
           const { done, value } = await reader.read()
-          if (done) break
+          console.log('Read chunk:', done ? 'done' : 'not done', value?.length || 0)
+
+          if (done) {
+            console.log('Stream complete')
+            break
+          }
 
           const chunk = decoder.decode(value)
+          console.log('Decoded chunk:', chunk)
           buffer += chunk
 
           const lines = buffer.split('\n')
           buffer = lines.pop() || ''
 
           for (const line of lines) {
+            console.log('Processing line:', line)
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(5))
@@ -70,10 +87,7 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
                 if (data.content && data.content.trim()) {
                   accumulatedContent = data.content
                   console.log('Updating content:', accumulatedContent)
-                  await new Promise<void>((resolve) => {
-                    onContentGenerated(accumulatedContent)
-                    resolve()
-                  })
+                  onContentGenerated(accumulatedContent)
                 }
 
                 if (data.done) {
@@ -86,26 +100,12 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
             }
           }
         }
-
-        if (buffer.length > 0) {
-          try {
-            const line = buffer.trim()
-            if (line.startsWith('data: ')) {
-              const data = JSON.parse(line.slice(5))
-              if (data.content && data.content.trim()) {
-                accumulatedContent = data.content
-                onContentGenerated(accumulatedContent)
-              }
-            }
-          } catch (e) {
-            console.error('Error parsing final buffer:', e)
-          }
-        }
-
       } finally {
+        console.log('Releasing reader')
         reader.releaseLock()
       }
 
+      console.log('Content generation complete')
       trackEvent('generate_content', {
         status: 'success',
         title,

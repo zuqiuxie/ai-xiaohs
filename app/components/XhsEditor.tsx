@@ -9,6 +9,7 @@ import MarkdownCard from './MarkdownCard';
 import { useAnalytics } from '../hooks/useAnalytics';
 import HotPostEditor from './HotPostEditor';
 import { showToast } from '@/app/utils/toast';
+import ErrorBoundary from './ErrorBoundary';
 
 const defaultSection: Section = {
   id: uuidv4(),
@@ -370,273 +371,303 @@ const XhsEditor = () => {
     return text.trim();
   };
 
+  // 确保正确传递 onContentGenerated
+  const handleContentGenerated = (content: string) => {
+    console.log('Content received in XhsEditor:', content)
+
+    // 添加内容验证
+    if (!content || typeof content !== 'string') {
+      console.error('Invalid content received:', content)
+      return
+    }
+
+    // 添加状态更新保护
+    try {
+      const newSections = [
+        {
+          ...defaultSection,
+          id: editorState.sections[0]?.id || uuidv4(),
+          content: content,
+        },
+      ]
+      console.log('Updating sections with:', newSections)
+
+      setEditorState(prev => {
+        const newState = { ...prev, sections: newSections }
+        console.log('New editor state:', newState)
+
+        // 添加验证
+        if (!newState.sections[0]?.content) {
+          console.error('Content not set in new state')
+        }
+
+        return newState
+      })
+    } catch (error) {
+      console.error('Error updating editor state:', error)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 优化后的顶部标题区 - 更紧凑的布局 */}
-        <header className="pt-8 pb-6 text-center">
-          {/* 主标题 - 合并为一行并优化文案 */}
-          <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
-            <span className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
-            <span className={`text-2xl sm:text-3xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
-          </h1>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* 优化后的顶部标题区 - 更紧凑的布局 */}
+          <header className="pt-8 pb-6 text-center">
+            {/* 主标题 - 合并为一行并优化文案 */}
+            <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
+              <span className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
+              <span className={`text-2xl sm:text-3xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
+            </h1>
 
-          {/* 副标题 - 简化布局 */}
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-600 leading-relaxed">
-            <span className="inline-flex items-center flex-wrap justify-center gap-2 sm:gap-3">
-              <span className="font-medium text-gray-900">AI智能创作</span>
-              <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-              </svg>
-              <span className="font-medium text-gray-900">一键排版</span>
-              <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-              </svg>
-              <span className="font-medium text-gray-900">即时导出</span>
-            </span>
-          </p>
-        </header>
+            {/* 副标题 - 简化布局 */}
+            <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-600 leading-relaxed">
+              <span className="inline-flex items-center flex-wrap justify-center gap-2 sm:gap-3">
+                <span className="font-medium text-gray-900">AI智能创作</span>
+                <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                </svg>
+                <span className="font-medium text-gray-900">一键排版</span>
+                <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                </svg>
+                <span className="font-medium text-gray-900">即时导出</span>
+              </span>
+            </p>
+          </header>
 
-        {/* 主要内容区 */}
-        <div className="mt-2">
-          {/* 添加模板选择区 */}
-          <div className="mb-3">
-            <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
-              <button
-                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
-                  editorState.template === 'ai'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                onClick={() => handleTemplateChange('ai')}>
-                主题生成
-              </button>
-              <button
-                className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
-                  editorState.template === 'hot_post'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                onClick={() => handleTemplateChange('hot_post')}>
-                爆款仿写
-              </button>
+          {/* 主要内容区 */}
+          <div className="mt-2">
+            {/* 添加模板选择区 */}
+            <div className="mb-3">
+              <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
+                <button
+                  className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                    editorState.template === 'ai'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  onClick={() => handleTemplateChange('ai')}>
+                  主题生成
+                </button>
+                <button
+                  className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                    editorState.template === 'hot_post'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  onClick={() => handleTemplateChange('hot_post')}>
+                  爆款仿写
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="flex gap-8 h-[calc(100vh-220px)]">
-            {/* 左侧编辑区 */}
-            <div className="flex-1 max-w-2xl flex flex-col">
-              {/* 样式设置区 */}
-              <div className="bg-white/60 rounded-lg p-3 mb-3 flex-shrink-0">
-                <h3 className="text-xs font-medium text-gray-900 mb-2">样式设置</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <label className="block text-xs text-gray-500 mb-1">字体</label>
-                      <select
-                        value={editorState.font}
-                        onChange={e => handleStyleChange('font', e.target.value)}
-                        className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
-                        {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
-                          <optgroup key={category} label={category}>
-                            {fonts.map(font => (
-                              <option key={font.label} value={font.value}>
-                                {font.label}
-                              </option>
-                            ))}
-                          </optgroup>
+            <div className="flex gap-8 h-[calc(100vh-220px)]">
+              {/* 左侧编辑区 */}
+              <div className="flex-1 max-w-2xl flex flex-col">
+                {/* 样式设置区 */}
+                <div className="bg-white/60 rounded-lg p-3 mb-3 flex-shrink-0">
+                  <h3 className="text-xs font-medium text-gray-900 mb-2">样式设置</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <label className="block text-xs text-gray-500 mb-1">字体</label>
+                        <select
+                          value={editorState.font}
+                          onChange={e => handleStyleChange('font', e.target.value)}
+                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
+                          {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
+                            <optgroup key={category} label={category}>
+                              {fonts.map(font => (
+                                <option key={font.label} value={font.value}>
+                                  {font.label}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-xs text-gray-500 mb-1">字号</label>
+                        <select
+                          value={editorState.fontSize}
+                          onChange={e => handleStyleChange('fontSize', e.target.value)}
+                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
+                          <option value="12px">12px - 小号</option>
+                          <option value="14px">14px - 正常</option>
+                          <option value="15px">15px - 中</option>
+                          <option value="16px">16px - 偏大</option>
+                          <option value="18px">18px - 大号</option>
+                          <option value="20px">20px - 特大</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">背景色</label>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { color: '#E6F7F3', name: '薄荷绿' },
+                          { color: '#F3E6FF', name: '梦紫' },
+                          { color: '#FFF3E6', name: '暖阳橙' },
+                          { color: '#E6F0FF', name: '天空蓝' },
+                          { color: '#FFE6E6', name: '樱花粉' },
+                          { color: '#F5F5F5', name: '简约灰' },
+                          { color: '#E8F4D9', name: '清新绿' },
+                          { color: '#FCE6E6', name: '珊瑚红' },
+                          { color: '#E6ECF4', name: '深海蓝' },
+                          { color: '#F9E9F9', name: '浪漫紫' },
+                          { color: '#FFF0E1', name: '奶茶棕' },
+                          { color: '#EDF3F7', name: '云雾蓝' },
+                        ].map(({ color, name }) => (
+                          <button
+                            key={color}
+                            className={`group relative w-7 h-7 rounded-full transition-all duration-300 ${
+                              editorState.backgroundColor === color
+                                ? 'ring-2 ring-offset-2 ring-blue-500/30 scale-110'
+                                : 'hover:scale-110'
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => handleStyleChange('backgroundColor', color)}>
+                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                              {name}
+                            </span>
+                          </button>
                         ))}
-                      </select>
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-xs text-gray-500 mb-1">字号</label>
-                      <select
-                        value={editorState.fontSize}
-                        onChange={e => handleStyleChange('fontSize', e.target.value)}
-                        className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
-                        <option value="12px">12px - 小号</option>
-                        <option value="14px">14px - 正常</option>
-                        <option value="15px">15px - 中</option>
-                        <option value="16px">16px - 偏大</option>
-                        <option value="18px">18px - 大号</option>
-                        <option value="20px">20px - 特大</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">背景色</label>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { color: '#E6F7F3', name: '薄荷绿' },
-                        { color: '#F3E6FF', name: '梦紫' },
-                        { color: '#FFF3E6', name: '暖阳橙' },
-                        { color: '#E6F0FF', name: '天空蓝' },
-                        { color: '#FFE6E6', name: '樱花粉' },
-                        { color: '#F5F5F5', name: '简约灰' },
-                        { color: '#E8F4D9', name: '清新绿' },
-                        { color: '#FCE6E6', name: '珊瑚红' },
-                        { color: '#E6ECF4', name: '深海蓝' },
-                        { color: '#F9E9F9', name: '浪漫紫' },
-                        { color: '#FFF0E1', name: '奶茶棕' },
-                        { color: '#EDF3F7', name: '云雾蓝' },
-                      ].map(({ color, name }) => (
-                        <button
-                          key={color}
-                          className={`group relative w-7 h-7 rounded-full transition-all duration-300 ${
-                            editorState.backgroundColor === color
-                              ? 'ring-2 ring-offset-2 ring-blue-500/30 scale-110'
-                              : 'hover:scale-110'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => handleStyleChange('backgroundColor', color)}>
-                          <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            {name}
-                          </span>
-                        </button>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 内容编辑区 */}
-              <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
-                <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-2">标题</label>
-                    <input
-                      type="text"
-                      value={editorState.title}
-                      onChange={e => handleTitleChange(e.target.value)}
-                      placeholder="输入标题"
-                      className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    />
-                  </div>
-
-                  {editorState.template === 'ai' ? (
-                    <AIContentEditor
-                      title={editorState.title}
-                      onContentGenerated={content => {
-                        const newSections = [
-                          {
-                            ...defaultSection,
-                            id: editorState.sections[0]?.id || uuidv4(),
-                            content: content,
-                          },
-                        ];
-                        setEditorState(prev => ({ ...prev, sections: newSections }));
-                      }}
-                    />
-                  ) : (
-                    <HotPostEditor
-                      onContentGenerated={content => {
-                        const newSections = [
-                          {
-                            ...defaultSection,
-                            id: editorState.sections[0]?.id || uuidv4(),
-                            content: content,
-                          },
-                        ];
-                        setEditorState(prev => ({ ...prev, sections: newSections }));
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* 右侧预览区 */}
-            <div className="w-[380px] flex-shrink-0">
-              <div className="flex flex-col items-start space-y-4">
-                {/* 预览卡片 */}
-                <div className="relative group">
-                  <MarkdownCard
-                    ref={cardRef}
-                    title={editorState.title}
-                    content={editorState.sections[0]?.content || ''}
-                    font={getFontStyle(editorState.font).fontFamily}
-                    fontSize={editorState.fontSize}
-                    backgroundColor={editorState.backgroundColor}
-                    onContentChange={handleCardContentChange}
-                    onTitleChange={handleCardTitleChange}
-                  />
-                </div>
-
-                {/* 操作按钮区 */}
-                <div className="w-[360px] flex gap-2">
-                  {/* 复制文本按钮 - 优化后的样式 */}
-                  <button
-                    onClick={async () => {
-                      const content = editorState.sections[0]?.content || '';
-                      if (!content.trim()) {
-                        showToast('暂无内容可复制', 'error');
-                        return;
-                      }
-
-                      try {
-                        const plainText = convertMarkdownToPlainText(content);
-                        await navigator.clipboard.writeText(plainText);
-                        showToast('已复制到剪贴板');
-                      } catch (err) {
-                        console.error('Failed to copy:', err);
-                        showToast('复制失败，请重试', 'error');
-                      }
-                    }}
-                    className="flex-1 px-4 py-2.5 bg-white/80 hover:bg-white/95
-                               border border-gray-200/50 backdrop-blur-sm
-                               rounded-xl transition-all duration-200
-                               text-sm font-medium text-gray-700
-                               flex items-center justify-center gap-2
-                               shadow-sm hover:shadow-md
-                               group relative">
-                    {/* 新的复制图标 */}
-                    <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-blue-500 transition-colors"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    <span className="group-hover:text-blue-600 transition-colors">复制文本</span>
-                  </button>
-
-                  {/* 下载图片按钮 - 保持原有样式但稍作调整以保持一致性 */}
-                  <button
-                    onClick={() => {
-                      const content = editorState.sections[0]?.content || '';
-                      if (!content.trim()) {
-                        showToast('暂无内容可下载', 'error');
-                        return;
-                      }
-                      handleDownload('png');
-                    }}
-                    className="flex-1 px-4 py-2.5
-                               bg-gradient-to-r from-blue-500 to-purple-500
-                               hover:from-blue-600 hover:to-purple-600
-                               text-white rounded-xl transition-all duration-200
-                               text-sm font-medium shadow-sm hover:shadow-md
-                               flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                {/* 内容编辑区 */}
+                <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
+                  <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-2">标题</label>
+                      <input
+                        type="text"
+                        value={editorState.title}
+                        onChange={e => handleTitleChange(e.target.value)}
+                        placeholder="输入标题"
+                        className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                       />
-                    </svg>
-                    下载图片
-                  </button>
+                    </div>
+
+                    {editorState.template === 'ai' ? (
+                      <AIContentEditor
+                        title={editorState.title}
+                        onContentGenerated={handleContentGenerated}
+                      />
+                    ) : (
+                      <HotPostEditor
+                        onContentGenerated={content => {
+                          const newSections = [
+                            {
+                              ...defaultSection,
+                              id: editorState.sections[0]?.id || uuidv4(),
+                              content: content,
+                            },
+                          ];
+                          setEditorState(prev => ({ ...prev, sections: newSections }));
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 右侧预览区 */}
+              <div className="w-[380px] flex-shrink-0">
+                <div className="flex flex-col items-start space-y-4">
+                  {/* 预览卡片 */}
+                  <div className="relative group">
+                    <MarkdownCard
+                      ref={cardRef}
+                      title={editorState.title}
+                      content={editorState.sections[0]?.content || ''}
+                      font={getFontStyle(editorState.font).fontFamily}
+                      fontSize={editorState.fontSize}
+                      backgroundColor={editorState.backgroundColor}
+                      onContentChange={handleCardContentChange}
+                      onTitleChange={handleCardTitleChange}
+                    />
+                  </div>
+
+                  {/* 操作按钮区 */}
+                  <div className="w-[360px] flex gap-2">
+                    {/* 复制文本按钮 - 优化后的样式 */}
+                    <button
+                      onClick={async () => {
+                        const content = editorState.sections[0]?.content || '';
+                        if (!content.trim()) {
+                          showToast('暂无内容可复制', 'error');
+                          return;
+                        }
+
+                        try {
+                          const plainText = convertMarkdownToPlainText(content);
+                          await navigator.clipboard.writeText(plainText);
+                          showToast('已复制到剪贴板');
+                        } catch (err) {
+                          console.error('Failed to copy:', err);
+                          showToast('复制失败，请重试', 'error');
+                        }
+                      }}
+                      className="flex-1 px-4 py-2.5 bg-white/80 hover:bg-white/95
+                                 border border-gray-200/50 backdrop-blur-sm
+                                 rounded-xl transition-all duration-200
+                                 text-sm font-medium text-gray-700
+                                 flex items-center justify-center gap-2
+                                 shadow-sm hover:shadow-md
+                                 group relative">
+                      {/* 新的复制图标 */}
+                      <svg
+                        className="w-4 h-4 text-gray-600 group-hover:text-blue-500 transition-colors"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span className="group-hover:text-blue-600 transition-colors">复制文本</span>
+                    </button>
+
+                    {/* 下载图片按钮 - 保持原有样式但稍作调整以保持一致性 */}
+                    <button
+                      onClick={() => {
+                        const content = editorState.sections[0]?.content || '';
+                        if (!content.trim()) {
+                          showToast('暂无内容可下载', 'error');
+                          return;
+                        }
+                        handleDownload('png');
+                      }}
+                      className="flex-1 px-4 py-2.5
+                                 bg-gradient-to-r from-blue-500 to-purple-500
+                                 hover:from-blue-600 hover:to-purple-600
+                                 text-white rounded-xl transition-all duration-200
+                                 text-sm font-medium shadow-sm hover:shadow-md
+                                 flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                      下载图片
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 
