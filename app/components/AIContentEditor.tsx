@@ -16,13 +16,7 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
 
     setIsLoading(true)
     setError(null)
-
-    // 记录生成内容的开始
-    trackEvent('generate_content', {
-      status: 'start',
-      title,
-      timestamp: new Date().toISOString(),
-    });
+    let accumulatedContent = ''
 
     try {
       const response = await fetch('/api/generate/ai-card', {
@@ -50,7 +44,6 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
-      let content = ''
 
       if (!reader) {
         throw new Error('No reader available')
@@ -71,12 +64,16 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
               try {
                 const data = JSON.parse(line.slice(5))
                 if (data.content && data.content.trim()) {
-                  content = data.content
-                  console.log('Updated content:', content)
-                  onContentGenerated(content)
+                  accumulatedContent = data.content
+                  console.log('Updated content:', accumulatedContent)
+                  onContentGenerated(accumulatedContent)
+                }
+                if (data.done) {
+                  console.log('Stream completed, final content:', accumulatedContent)
+                  break
                 }
               } catch (e) {
-                console.error('Error parsing chunk:', e)
+                console.error('Error parsing chunk:', e, 'Line:', line)
               }
             }
           }
@@ -85,23 +82,22 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         reader.releaseLock()
       }
 
-      // 记录生成成功
       trackEvent('generate_content', {
         status: 'success',
         title,
+        contentLength: accumulatedContent.length,
         timestamp: new Date().toISOString(),
-      });
+      })
     } catch (error) {
       console.error('Failed to generate content:', error)
       setError(error instanceof Error ? error.message : 'Failed to generate content')
 
-      // 记录生成失败
       trackEvent('generate_content', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error',
         title,
         timestamp: new Date().toISOString(),
-      });
+      })
     } finally {
       setIsLoading(false)
     }
