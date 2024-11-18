@@ -17,7 +17,6 @@ export async function POST(req: Request) {
   try {
     const { originalText, title, keywords, style, additionalInfo } = await req.json()
 
-    // 验证必要参数
     if (!originalText || !title || !keywords) {
       return new Response(
         JSON.stringify({ error: 'Missing required parameters' }),
@@ -95,7 +94,8 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
       throw new Error(`Deepseek API error: ${response.status}`)
     }
 
-    // 使用 ReadableStream 处理流式响应
+    let buffer = '' // 添加buffer处理不完整的数据
+
     const stream = new ReadableStream({
       async start(controller) {
         const reader = response.body?.getReader()
@@ -113,11 +113,20 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
             if (done) break
 
             const chunk = decoder.decode(value)
-            const lines = chunk.split('\n')
+            buffer += chunk // 将新chunk添加到buffer
+
+            // 处理完整的行
+            const lines = buffer.split('\n')
+            // 保留最后一个可能不完整的行
+            buffer = lines.pop() || ''
 
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 const data = line.slice(5).trim()
+
+                // 调试日志
+                console.log('Processing line:', data)
+
                 if (data === '[DONE]') {
                   controller.enqueue(
                     `data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`
@@ -129,20 +138,46 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
                   const parsed = JSON.parse(data)
                   if (parsed.choices?.[0]?.delta?.content) {
                     accumulatedContent += parsed.choices[0].delta.content
-                    controller.enqueue(
-                      `data: ${JSON.stringify({
-                        content: accumulatedContent,
-                        done: false
-                      })}\n\n`
-                    )
+                    // 确保发送格式一致的数据
+                    const chunk = `data: ${JSON.stringify({
+                      content: accumulatedContent,
+                      done: false
+                    })}\n\n`
+                    controller.enqueue(chunk)
                   }
                 } catch (e) {
-                  console.error('Parse error:', e)
+                  console.error('Parse error:', e, 'Data:', data)
                   continue
                 }
               }
             }
           }
+
+          // 处理最后可能剩余的buffer
+          if (buffer.length > 0) {
+            try {
+              const data = buffer.trim()
+              if (data.startsWith('data: ')) {
+                const parsed = JSON.parse(data.slice(5))
+                if (parsed.choices?.[0]?.delta?.content) {
+                  accumulatedContent += parsed.choices[0].delta.content
+                  controller.enqueue(
+                    `data: ${JSON.stringify({
+                      content: accumulatedContent,
+                      done: false
+                    })}\n\n`
+                  )
+                }
+              }
+            } catch (e) {
+              console.error('Final buffer parse error:', e)
+            }
+          }
+
+          // 确保发送最终内容
+          controller.enqueue(
+            `data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`
+          )
         } catch (error) {
           console.error('Stream error:', error)
           controller.error(error)
