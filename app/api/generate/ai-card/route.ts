@@ -95,41 +95,57 @@ export async function POST(req: Request) {
     }
 
     const transformStream = new TransformStream({
-      async transform(chunk, controller) {
+      start(controller) {
+        (this as any).buffer = '';
+        (this as any).processLine = (line: string) => {
+          if (line.trim() === '') return;
+          if (line.startsWith('data: ')) {
+            const data = line.slice(5).trim();
+            if (data === '[DONE]') {
+              controller.enqueue(`data: ${JSON.stringify({ done: true })}\n\n`);
+              return;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content || '';
+              if (content) {
+                controller.enqueue(`data: ${JSON.stringify({
+                  content,
+                  done: false,
+                  isPartial: true
+                })}\n\n`);
+              }
+            } catch (e) {
+              console.error('Parse error:', e, 'Line:', line);
+            }
+          }
+        };
+      },
+
+      transform(chunk, controller) {
         try {
           console.log('[Edge] Processing chunk:', new Date().toISOString(), 'Size:', chunk.length);
           const text = new TextDecoder().decode(chunk);
           console.log('Raw chunk:', text);
 
-          const lines = text.split('\n');
-          for (const line of lines) {
-            if (line.trim() === '') continue;
-            if (line.startsWith('data: ')) {
-              const data = line.slice(5).trim();
-              if (data === '[DONE]') {
-                controller.enqueue(`data: ${JSON.stringify({ done: true })}\n\n`);
-                continue;
-              }
+          (this as any).buffer += text;
 
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices?.[0]?.delta?.content || '';
-                if (content) {
-                  controller.enqueue(`data: ${JSON.stringify({
-                    content,
-                    done: false,
-                    isPartial: true  // 添加标记表示这是部分内容
-                  })}\n\n`);
-                }
-              } catch (e) {
-                console.error('Parse error:', e, 'Line:', line);
-              }
-            }
+          const lines = (this as any).buffer.split('\n');
+
+          (this as any).buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            (this as any).processLine(line);
           }
-          console.log('[Edge] Chunk processed:', new Date().toISOString());
         } catch (error) {
           console.error('[Edge] Transform error:', error, new Date().toISOString());
-          controller.error(error);
+        }
+      },
+
+      flush(controller) {
+        if ((this as any).buffer) {
+          (this as any).processLine((this as any).buffer);
         }
       }
     });
