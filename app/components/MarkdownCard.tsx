@@ -1,5 +1,5 @@
 import ReactMarkdown from 'react-markdown';
-import { forwardRef, useState, useEffect } from 'react';
+import { forwardRef, useState } from 'react';
 
 interface ComponentProps {
   children?: React.ReactNode;
@@ -19,22 +19,12 @@ interface MarkdownCardProps {
 
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
   ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange, onDownload }, ref) => {
-    console.log('MarkdownCard render:', { content, font, fontSize })
-
     const [isEditing, setIsEditing] = useState(false);
     const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
     const contentSize = fontSize;
     const h1Size = `${parseInt(fontSize) + 4}px`;
     const h2Size = `${parseInt(fontSize) + 2}px`;
     const h3Size = `${parseInt(fontSize) + 1}px`;
-
-    useEffect(() => {
-      if (!content) {
-        console.log('Content is empty in MarkdownCard')
-      } else {
-        console.log('Content updated in MarkdownCard:', content.slice(0, 100) + '...')
-      }
-    }, [content])
 
     const handleCopy = async () => {
       try {

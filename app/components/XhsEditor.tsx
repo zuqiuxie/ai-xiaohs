@@ -373,40 +373,22 @@ const XhsEditor = () => {
 
   // 确保正确传递 onContentGenerated
   const handleContentGenerated = (content: string) => {
-    console.log('Content received in XhsEditor:', content)
-
-    // 添加内容验证
-    if (!content || typeof content !== 'string') {
-      console.error('Invalid content received:', content)
-      return
-    }
-
-    // 添加状态更新保护
-    try {
-      const newSections = [
-        {
-          ...defaultSection,
-          id: editorState.sections[0]?.id || uuidv4(),
-          content: content,
-        },
-      ]
-      console.log('Updating sections with:', newSections)
-
-      setEditorState(prev => {
-        const newState = { ...prev, sections: newSections }
-        console.log('New editor state:', newState)
-
-        // 添加验证
-        if (!newState.sections[0]?.content) {
-          console.error('Content not set in new state')
-        }
-
-        return newState
-      })
-    } catch (error) {
-      console.error('Error updating editor state:', error)
-    }
-  }
+    console.log('Content received in XhsEditor:', content);
+    // 更新状态
+    const newSections = [
+      {
+        ...defaultSection,
+        id: editorState.sections[0]?.id || uuidv4(),
+        content: content,
+      },
+    ];
+    console.log('Updating sections with:', newSections);
+    setEditorState(prev => {
+      const newState = { ...prev, sections: newSections };
+      console.log('New editor state:', newState);
+      return newState;
+    });
+  };
 
   return (
     <ErrorBoundary>
@@ -555,10 +537,7 @@ const XhsEditor = () => {
                     </div>
 
                     {editorState.template === 'ai' ? (
-                      <AIContentEditor
-                        title={editorState.title}
-                        onContentGenerated={handleContentGenerated}
-                      />
+                      <AIContentEditor title={editorState.title} onContentGenerated={handleContentGenerated} />
                     ) : (
                       <HotPostEditor
                         onContentGenerated={content => {
