@@ -59,7 +59,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let content = '';
+      let accumulatedContent = '';
 
       if (!reader) {
         throw new Error('No reader available');
@@ -77,12 +77,21 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(5));
-                if (data.content && data.content.trim()) {
-                  content = data.content;
-                  onContentGenerated(content);
+                if (data.done) {
+                  console.log('Stream complete');
+                  break;
+                }
+                if (data.content && typeof data.content === 'string') {
+                  if (data.isPartial) {
+                    accumulatedContent += data.content;
+                    onContentGenerated(accumulatedContent);
+                  } else {
+                    accumulatedContent = data.content;
+                    onContentGenerated(accumulatedContent);
+                  }
                 }
               } catch (e) {
-                console.error('Error parsing chunk:', e);
+                console.error('Error parsing chunk:', e, 'Line:', line);
               }
             }
           }

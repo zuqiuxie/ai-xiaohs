@@ -94,99 +94,67 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
       throw new Error(`Deepseek API error: ${response.status}`)
     }
 
-    let buffer = '' // 添加buffer处理不完整的数据
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader()
-        if (!reader) {
-          controller.close()
-          return
-        }
-
-        let accumulatedContent = ''
-        const decoder = new TextDecoder()
-
-        try {
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-
-            const chunk = decoder.decode(value)
-            buffer += chunk // 将新chunk添加到buffer
-
-            // 处理完整的行
-            const lines = buffer.split('\n')
-            // 保留最后一个可能不完整的行
-            buffer = lines.pop() || ''
-
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(5).trim()
-
-                // 调试日志
-                console.log('Processing line:', data)
-
-                if (data === '[DONE]') {
-                  controller.enqueue(
-                    `data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`
-                  )
-                  continue
-                }
-
-                try {
-                  const parsed = JSON.parse(data)
-                  if (parsed.choices?.[0]?.delta?.content) {
-                    accumulatedContent += parsed.choices[0].delta.content
-                    // 确保发送格式一致的数据
-                    const chunk = `data: ${JSON.stringify({
-                      content: accumulatedContent,
-                      done: false
-                    })}\n\n`
-                    controller.enqueue(chunk)
-                  }
-                } catch (e) {
-                  console.error('Parse error:', e, 'Data:', data)
-                  continue
-                }
-              }
+    const transformStream = new TransformStream({
+      start(controller) {
+        (this as any).buffer = '';
+        (this as any).processLine = (line: string) => {
+          if (line.trim() === '') return;
+          if (line.startsWith('data: ')) {
+            const data = line.slice(5).trim();
+            if (data === '[DONE]') {
+              controller.enqueue(`data: ${JSON.stringify({ done: true })}\n\n`);
+              return;
             }
-          }
 
-          // 处理最后可能剩余的buffer
-          if (buffer.length > 0) {
             try {
-              const data = buffer.trim()
-              if (data.startsWith('data: ')) {
-                const parsed = JSON.parse(data.slice(5))
-                if (parsed.choices?.[0]?.delta?.content) {
-                  accumulatedContent += parsed.choices[0].delta.content
-                  controller.enqueue(
-                    `data: ${JSON.stringify({
-                      content: accumulatedContent,
-                      done: false
-                    })}\n\n`
-                  )
-                }
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content || '';
+              if (content) {
+                controller.enqueue(`data: ${JSON.stringify({
+                  content,
+                  done: false,
+                  isPartial: true
+                })}\n\n`);
               }
             } catch (e) {
-              console.error('Final buffer parse error:', e)
+              console.error('Parse error:', e, 'Line:', line);
             }
           }
+        };
+      },
 
-          // 确保发送最终内容
-          controller.enqueue(
-            `data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`
-          )
+      transform(chunk, controller) {
+        try {
+          console.log('[Edge] Processing chunk:', new Date().toISOString(), 'Size:', chunk.length);
+          const text = new TextDecoder().decode(chunk);
+          console.log('Raw chunk:', text);
+
+          (this as any).buffer += text;
+          const lines = (this as any).buffer.split('\n');
+          (this as any).buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            (this as any).processLine(line);
+          }
         } catch (error) {
-          console.error('Stream error:', error)
-          controller.error(error)
-        } finally {
-          reader.releaseLock()
-          controller.close()
+          console.error('[Edge] Transform error:', error, new Date().toISOString());
+        }
+      },
+
+      flush(controller) {
+        if ((this as any).buffer) {
+          (this as any).processLine((this as any).buffer);
         }
       }
-    })
+    });
+
+    const stream = response.body
+      ?.pipeThrough(transformStream)
+      ?.pipeThrough(new TextEncoderStream());
+
+    if (!stream) {
+      throw new Error('Failed to create stream');
+    }
 
     return new Response(stream, {
       headers: {
@@ -194,9 +162,11 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
         'X-Accel-Buffering': 'no',
-        'X-Edge-Function': 'true'
-      }
-    })
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
 
   } catch (error) {
     console.error('Generation error:', error)
