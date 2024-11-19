@@ -12,6 +12,9 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
   const { trackEvent } = useAnalytics();
 
   const generateContent = async () => {
+    const startTime = Date.now();
+    console.log('[Client] Generation started:', new Date().toISOString());
+
     if (!title) return;
 
     setIsLoading(true);
@@ -21,7 +24,6 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
     console.log('Starting content generation...');
 
     try {
-      console.log('Sending request to API...');
       const response = await fetch('/api/generate/ai-card', {
         method: 'POST',
         headers: {
@@ -30,11 +32,6 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         body: JSON.stringify({
           messages: [
             {
-              role: 'system',
-              content:
-                '你是一个专业的内容创作者，擅长生成小红书风格的文章。请根据用户提供的主题，生成一篇结构清晰、内容丰富的文章。使用 Markdown 格式。',
-            },
-            {
               role: 'user',
               content: title,
             },
@@ -42,68 +39,89 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         }),
       });
 
-      console.log('Response received:', response.status);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
 
       const reader = response.body?.getReader();
-      console.log('Reader created:', !!reader);
-
       if (!reader) {
         throw new Error('No reader available');
       }
 
       const decoder = new TextDecoder();
-      let buffer = '';
 
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          console.log('Read chunk:', done ? 'done' : 'not done', value?.length || 0);
+      // 监控流式响应
+      let chunkCount = 0;
+      let lastChunkTime = Date.now();
 
-          if (done) {
-            console.log('Stream complete');
-            break;
-          }
+      while (true) {
+        const { done, value } = await reader.read();
 
-          const chunk = decoder.decode(value);
-          console.log('Decoded chunk:', chunk);
-          buffer += chunk;
+        if (done) {
+          const totalTime = Date.now() - startTime;
+          console.log('[Client] Stream complete:', {
+            totalTime: `${totalTime}ms`,
+            chunkCount,
+            timestamp: new Date().toISOString()
+          });
+          break;
+        }
 
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
+        chunkCount++;
+        const currentTime = Date.now();
+        const timeSinceLastChunk = currentTime - lastChunkTime;
 
-          for (const line of lines) {
-            console.log('Processing line:', line);
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(5));
-                console.log('Parsed data:', data);
+        // 监控块之间的延迟
+        if (timeSinceLastChunk > 5000) { // 5秒阈值
+          console.warn('[Client] Long delay between chunks:', {
+            delay: `${timeSinceLastChunk}ms`,
+            chunkNumber: chunkCount,
+            timestamp: new Date().toISOString()
+          });
+        }
 
-                if (data.content && data.content.trim()) {
-                  accumulatedContent = data.content;
-                  console.log('Updating content:', accumulatedContent);
-                  onContentGenerated(accumulatedContent);
-                }
+        lastChunkTime = currentTime;
+        console.log('[Client] Chunk received:', {
+          chunkNumber: chunkCount,
+          chunkSize: value.length,
+          timeSinceStart: `${currentTime - startTime}ms`,
+          timestamp: new Date().toISOString()
+        });
 
-                if (data.done) {
-                  console.log('Stream completed with content:', accumulatedContent);
-                  continue;
-                }
-              } catch (e) {
-                console.error('Error parsing chunk:', e, 'Line:', line);
+        const chunk = decoder.decode(value);
+        console.log('Raw chunk received:', chunk);
+
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(5));
+              console.log('Parsed data:', data);
+
+              if (data.content && typeof data.content === 'string') {
+                accumulatedContent += data.content;
+                console.log('Accumulated content:', accumulatedContent);
+                onContentGenerated(accumulatedContent);
               }
+
+              if (data.done) {
+                console.log('Stream marked as done');
+              }
+            } catch (e) {
+              console.error('Error parsing chunk:', e, 'Line:', line);
             }
           }
         }
-      } finally {
-        console.log('Releasing reader');
-        reader.releaseLock();
       }
 
-      console.log('Content generation complete');
+      if (!accumulatedContent.trim()) {
+        throw new Error('No content was generated');
+      }
+
       trackEvent('generate_content', {
         status: 'success',
         title,
@@ -111,7 +129,11 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('Failed to generate content:', error);
+      console.error('[Client] Generation error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timeSinceStart: `${Date.now() - startTime}ms`,
+        timestamp: new Date().toISOString()
+      });
       setError(error instanceof Error ? error.message : 'Failed to generate content');
 
       trackEvent('generate_content', {

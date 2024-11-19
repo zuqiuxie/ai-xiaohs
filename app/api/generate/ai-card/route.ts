@@ -4,10 +4,24 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 export async function POST(req: Request) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400',
+      },
+    });
+  }
+
   if (!DEEPSEEK_API_KEY) {
     return new Response(JSON.stringify({ error: 'API key is not configured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
 
@@ -17,11 +31,13 @@ export async function POST(req: Request) {
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'Invalid messages format' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       });
     }
 
-    // 构建增强的消息数组
     const enhancedMessages = [
       {
         role: 'system',
@@ -73,111 +89,76 @@ export async function POST(req: Request) {
     });
 
     if (!response.ok) {
-      throw new Error(`Deepseek API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Deepseek API error:', response.status, errorText);
+      throw new Error(`Deepseek API error: ${response.status} - ${errorText}`);
     }
 
-    // 使用 ReadableStream 和 TransformStream 处理流式响应
-    let buffer = ''; // 添加buffer处理不完整的数据
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader();
-        if (!reader) {
-          controller.close();
-          return;
-        }
-
-        let accumulatedContent = '';
-        const decoder = new TextDecoder();
-
+    const transformStream = new TransformStream({
+      async transform(chunk, controller) {
         try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+          console.log('[Edge] Processing chunk:', new Date().toISOString(), 'Size:', chunk.length);
+          const text = new TextDecoder().decode(chunk);
+          console.log('Raw chunk:', text);
 
-            const chunk = decoder.decode(value);
-            buffer += chunk; // 将新chunk添加到buffer
+          const lines = text.split('\n');
+          for (const line of lines) {
+            if (line.trim() === '') continue;
+            if (line.startsWith('data: ')) {
+              const data = line.slice(5).trim();
+              if (data === '[DONE]') {
+                controller.enqueue(`data: ${JSON.stringify({ done: true })}\n\n`);
+                continue;
+              }
 
-            // 处理完整的行
-            const lines = buffer.split('\n');
-            // 保留最后一个可能不完整的行
-            buffer = lines.pop() || '';
-
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(5).trim();
-
-                // 调试日志
-                console.log('Processing line:', data);
-
-                if (data === '[DONE]') {
-                  controller.enqueue(`data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`);
-                  continue;
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                if (content) {
+                  controller.enqueue(`data: ${JSON.stringify({
+                    content,
+                    done: false,
+                    isPartial: true  // 添加标记表示这是部分内容
+                  })}\n\n`);
                 }
-
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.choices?.[0]?.delta?.content) {
-                    accumulatedContent += parsed.choices[0].delta.content;
-                    // 确保发送格式一致的数据
-                    const chunk = `data: ${JSON.stringify({
-                      content: accumulatedContent,
-                      done: false,
-                    })}\n\n`;
-                    controller.enqueue(chunk);
-                  }
-                } catch (e) {
-                  console.error('Parse error:', e, 'Data:', data);
-                  continue;
-                }
+              } catch (e) {
+                console.error('Parse error:', e, 'Line:', line);
               }
             }
           }
-
-          // 处理最后可能剩余的buffer
-          if (buffer.length > 0) {
-            try {
-              const data = buffer.trim();
-              if (data.startsWith('data: ')) {
-                const parsed = JSON.parse(data.slice(5));
-                if (parsed.choices?.[0]?.delta?.content) {
-                  accumulatedContent += parsed.choices[0].delta.content;
-                  controller.enqueue(
-                    `data: ${JSON.stringify({
-                      content: accumulatedContent,
-                      done: false,
-                    })}\n\n`
-                  );
-                }
-              }
-            } catch (e) {
-              console.error('Final buffer parse error:', e);
-            }
-          }
-
-          // 确保发送最终内容
-          controller.enqueue(`data: ${JSON.stringify({ content: accumulatedContent, done: true })}\n\n`);
+          console.log('[Edge] Chunk processed:', new Date().toISOString());
         } catch (error) {
-          console.error('Stream error:', error);
+          console.error('[Edge] Transform error:', error, new Date().toISOString());
           controller.error(error);
-        } finally {
-          reader.releaseLock();
-          controller.close();
         }
-      },
+      }
     });
+
+    const stream = response.body
+      ?.pipeThrough(transformStream)
+      ?.pipeThrough(new TextEncoderStream());
+
+    if (!stream) {
+      throw new Error('Failed to create stream');
+    }
 
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
-        Connection: 'keep-alive',
+        'Connection': 'keep-alive',
         'X-Accel-Buffering': 'no',
-        'X-Edge-Function': 'true',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
     });
   } catch (error) {
-    console.error('Generation error:', error);
+    console.error('[Edge] Generation error:', {
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+      type: error instanceof Error ? error.name : 'Unknown type'
+    });
     return new Response(
       JSON.stringify({
         error: '生成失败，请重试',
@@ -185,7 +166,10 @@ export async function POST(req: Request) {
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
     );
   }
