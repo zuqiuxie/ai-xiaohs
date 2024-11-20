@@ -394,23 +394,23 @@ const XhsEditor = () => {
     <ErrorBoundary>
       <div className="h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
         <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 头部区域 - 减小上下间距但保留内容 */}
-          <header className="h-[100px] flex flex-col justify-center">
-            {/* 主标题 */}
-            <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+          {/* 调整头部区域的高度和间距 */}
+          <header className="h-[120px] pt-6 flex flex-col justify-center">
+            {/* 主标题 - 调整间距和大小 */}
+            <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3">
               <span className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
               <span className={`text-xl sm:text-2xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
             </h1>
 
-            {/* 保留副标题但减小间距 */}
-            <p className="mt-2 max-w-2xl mx-auto text-sm sm:text-base text-gray-600">
+            {/* 副标题 - 调整上边距和大小 */}
+            <p className="mt-1.5 max-w-2xl mx-auto text-sm text-gray-600">
               <span className="inline-flex items-center flex-wrap justify-center gap-2">
                 <span className="font-medium text-gray-900">AI智能创作</span>
-                <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                 </svg>
                 <span className="font-medium text-gray-900">一键排版</span>
-                <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                 </svg>
                 <span className="font-medium text-gray-900">即时导出</span>
@@ -418,8 +418,8 @@ const XhsEditor = () => {
             </p>
           </header>
 
-          {/* 主要内容区 - 使用剩余高度 */}
-          <div className="h-[calc(100vh-100px)]">
+          {/* 调整主内容区域的高度计算 */}
+          <div className="h-[calc(100vh-120px)]">
             {/* 模板选择区 */}
             <div className="h-[40px] flex items-center">
               <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
