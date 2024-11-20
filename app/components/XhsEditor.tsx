@@ -396,7 +396,7 @@ const XhsEditor = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* 优化后的顶部标题区 - 更紧凑的布局 */}
           <header className="pt-8 pb-6 text-center">
-            {/* 主标题 - 合并为一行并优化文案 */}
+{/* 主标题 - 合并为一行并优化文案 */}
             <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
               <span className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
               <span className={`text-2xl sm:text-3xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
@@ -419,21 +419,21 @@ const XhsEditor = () => {
           </header>
 
           {/* 主要内容区 */}
-          <div className="mt-2">
-            {/* 添加模板选择区 */}
-            <div className="mb-3">
+          <div className="mt-1">
+            {/* 模板选择区 - 更紧凑 */}
+            <div className="mb-2">
               <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
                 <button
-                  className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  className={`px-3 py-1 rounded-md transition-all duration-300 text-sm ${
                     editorState.template === 'ai'
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                   onClick={() => handleTemplateChange('ai')}>
-                  主题生成
+                  灵感创作
                 </button>
                 <button
-                  className={`px-4 py-1.5 rounded-md transition-all duration-300 text-sm ${
+                  className={`px-3 py-1 rounded-md transition-all duration-300 text-sm ${
                     editorState.template === 'hot_post'
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
@@ -444,89 +444,78 @@ const XhsEditor = () => {
               </div>
             </div>
 
-            <div className="flex gap-8 h-[calc(100vh-220px)]">
+            <div className="flex gap-6 h-[calc(100vh-120px)]">
               {/* 左侧编辑区 */}
               <div className="flex-1 max-w-2xl flex flex-col">
-                {/* 样式设置区 */}
-                <div className="bg-white/60 rounded-lg p-3 mb-3 flex-shrink-0">
-                  <h3 className="text-xs font-medium text-gray-900 mb-2">样式设置</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <label className="block text-xs text-gray-500 mb-1">字体</label>
-                        <select
-                          value={editorState.font}
-                          onChange={e => handleStyleChange('font', e.target.value)}
-                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
-                          {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
-                            <optgroup key={category} label={category}>
-                              {fonts.map(font => (
-                                <option key={font.label} value={font.value}>
-                                  {font.label}
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs text-gray-500 mb-1">字号</label>
-                        <select
-                          value={editorState.fontSize}
-                          onChange={e => handleStyleChange('fontSize', e.target.value)}
-                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
-                          <option value="12px">12px - 小号</option>
-                          <option value="14px">14px - 正常</option>
-                          <option value="15px">15px - 中</option>
-                          <option value="16px">16px - 偏大</option>
-                          <option value="18px">18px - 大号</option>
-                          <option value="20px">20px - 特大</option>
-                        </select>
-                      </div>
+                {/* 样式设置区 - 更紧凑的布局 */}
+                <div className="bg-white/60 rounded-lg p-2 mb-2 flex-shrink-0">
+                  <div className="grid grid-cols-12 gap-3">
+                    {/* 字体和字号选择 */}
+                    <div className="col-span-5">
+                      <select
+                        value={editorState.font}
+                        onChange={e => handleStyleChange('font', e.target.value)}
+                        className="w-full px-2 py-1 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
+                        {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
+                          <optgroup key={category} label={category}>
+                            {fonts.map(font => (
+                              <option key={font.label} value={font.value}>
+                                {font.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-span-3">
+                      <select
+                        value={editorState.fontSize}
+                        onChange={e => handleStyleChange('fontSize', e.target.value)}
+                        className="w-full px-2 py-1 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all">
+                        <option value="14px">14px</option>
+                        <option value="15px">15px</option>
+                        <option value="16px">16px</option>
+                        <option value="18px">18px</option>
+                        <option value="20px">20px</option>
+                      </select>
                     </div>
 
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">背景色</label>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { color: '#E6F7F3', name: '薄荷绿' },
-                          { color: '#F3E6FF', name: '梦紫' },
-                          { color: '#FFF3E6', name: '暖阳橙' },
-                          { color: '#E6F0FF', name: '天空蓝' },
-                          { color: '#FFE6E6', name: '樱花粉' },
-                          { color: '#F5F5F5', name: '简约灰' },
-                          { color: '#E8F4D9', name: '清新绿' },
-                          { color: '#FCE6E6', name: '珊瑚红' },
-                          { color: '#E6ECF4', name: '深海蓝' },
-                          { color: '#F9E9F9', name: '浪漫紫' },
-                          { color: '#FFF0E1', name: '奶茶棕' },
-                          { color: '#EDF3F7', name: '云雾蓝' },
-                        ].map(({ color, name }) => (
-                          <button
-                            key={color}
-                            className={`group relative w-7 h-7 rounded-full transition-all duration-300 ${
-                              editorState.backgroundColor === color
-                                ? 'ring-2 ring-offset-2 ring-blue-500/30 scale-110'
-                                : 'hover:scale-110'
-                            }`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => handleStyleChange('backgroundColor', color)}>
-                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                              {name}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+                    {/* 背景色选择 - 更多颜色选项 */}
+                    <div className="col-span-4 flex items-center gap-1.5 pl-1">
+                      {[
+                        { color: '#E6F7F3', name: '薄荷绿' },
+                        { color: '#F3E6FF', name: '梦幻紫' },
+                        { color: '#FFF3E6', name: '暖阳橙' },
+                        { color: '#E6F0FF', name: '天空蓝' },
+                        { color: '#FFE6E6', name: '樱花粉' },
+                        { color: '#F5F5F5', name: '简约灰' },
+                        { color: '#E8F4D9', name: '清新绿' },
+                        { color: '#FCE6E6', name: '珊瑚红' },
+                      ].map(({ color, name }) => (
+                        <button
+                          key={color}
+                          className={`group relative w-5 h-5 rounded-full transition-all duration-300 ${
+                            editorState.backgroundColor === color
+                              ? 'ring-2 ring-offset-1 ring-blue-500/30 scale-110'
+                              : 'hover:scale-110'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => handleStyleChange('backgroundColor', color)}>
+                          <span
+                            className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500
+                                         opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {name}
+                          </span>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
 
                 {/* 内容编辑区 */}
                 <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
-                  <h3 className="text-xs font-medium text-gray-900 mb-2">内容编辑</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-2">标题</label>
                       <input
                         type="text"
                         value={editorState.title}

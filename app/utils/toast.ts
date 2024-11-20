@@ -1,4 +1,4 @@
-type ToastType = 'success' | 'error';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 export const showToast = (message: string, type: ToastType = 'success') => {
   // 移除已存在的 toast
