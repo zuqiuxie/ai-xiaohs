@@ -392,19 +392,19 @@ const XhsEditor = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 优化后的顶部标题区 - 更紧凑的布局 */}
-          <header className="pt-8 pb-6 text-center">
-{/* 主标题 - 合并为一行并优化文案 */}
-            <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
-              <span className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
-              <span className={`text-2xl sm:text-3xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
+      <div className="h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+        <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* 头部区域 - 减小上下间距但保留内容 */}
+          <header className="h-[100px] flex flex-col justify-center">
+            {/* 主标题 */}
+            <h1 className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+              <span className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
+              <span className={`text-xl sm:text-2xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
             </h1>
 
-            {/* 副标题 - 简化布局 */}
-            <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-600 leading-relaxed">
-              <span className="inline-flex items-center flex-wrap justify-center gap-2 sm:gap-3">
+            {/* 保留副标题但减小间距 */}
+            <p className="mt-2 max-w-2xl mx-auto text-sm sm:text-base text-gray-600">
+              <span className="inline-flex items-center flex-wrap justify-center gap-2">
                 <span className="font-medium text-gray-900">AI智能创作</span>
                 <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
@@ -418,10 +418,10 @@ const XhsEditor = () => {
             </p>
           </header>
 
-          {/* 主要内容区 */}
-          <div className="mt-1">
-            {/* 模板选择区 - 更紧凑 */}
-            <div className="mb-2">
+          {/* 主要内容区 - 使用剩余高度 */}
+          <div className="h-[calc(100vh-100px)]">
+            {/* 模板选择区 */}
+            <div className="h-[40px] flex items-center">
               <div className="inline-flex p-0.5 bg-gray-100/80 rounded-lg">
                 <button
                   className={`px-3 py-1 rounded-md transition-all duration-300 text-sm ${
@@ -444,11 +444,12 @@ const XhsEditor = () => {
               </div>
             </div>
 
-            <div className="flex gap-6 h-[calc(100vh-120px)]">
+            {/* 编辑区域 - 使用剩余高度 */}
+            <div className="h-[calc(100vh-140px)] flex gap-6">
               {/* 左侧编辑区 */}
               <div className="flex-1 max-w-2xl flex flex-col">
-                {/* 样式设置区 - 更紧凑的布局 */}
-                <div className="bg-white/60 rounded-lg p-2 mb-2 flex-shrink-0">
+                {/* 样式设置区 */}
+                <div className="h-[40px] bg-white/60 rounded-lg p-2 mb-2 flex-shrink-0">
                   <div className="grid grid-cols-12 gap-3">
                     {/* 字体和字号选择 */}
                     <div className="col-span-5">
@@ -513,7 +514,7 @@ const XhsEditor = () => {
                 </div>
 
                 {/* 内容编辑区 */}
-                <div className="bg-white/60 rounded-lg p-3 flex-1 overflow-auto">
+                <div className="flex-1 bg-white/60 rounded-lg p-3 overflow-hidden">
                   <div className="space-y-4">
                     <div>
                       <input
@@ -547,88 +548,84 @@ const XhsEditor = () => {
 
               {/* 右侧预览区 */}
               <div className="w-[380px] flex-shrink-0">
-                <div className="flex flex-col items-start space-y-4">
-                  {/* 预览卡片 */}
-                  <div className="relative group">
-                    <MarkdownCard
-                      ref={cardRef}
-                      title={editorState.title}
-                      content={editorState.sections[0]?.content || ''}
-                      font={getFontStyle(editorState.font).fontFamily}
-                      fontSize={editorState.fontSize}
-                      backgroundColor={editorState.backgroundColor}
-                      onContentChange={handleCardContentChange}
-                      onTitleChange={handleCardTitleChange}
-                    />
-                  </div>
+                {/* 预览卡片 */}
+                <div className="relative group">
+                  <MarkdownCard
+                    ref={cardRef}
+                    title={editorState.title}
+                    content={editorState.sections[0]?.content || ''}
+                    font={getFontStyle(editorState.font).fontFamily}
+                    fontSize={editorState.fontSize}
+                    backgroundColor={editorState.backgroundColor}
+                    onContentChange={handleCardContentChange}
+                    onTitleChange={handleCardTitleChange}
+                  />
+                </div>
 
-                  {/* 操作按钮区 */}
-                  <div className="w-[360px] flex gap-2">
-                    {/* 复制文本按钮 - 优化后的样式 */}
-                    <button
-                      onClick={async () => {
-                        const content = editorState.sections[0]?.content || '';
-                        if (!content.trim()) {
-                          showToast('暂无内容可复制', 'error');
-                          return;
-                        }
+                {/* 操作按钮 - 减小上边距 */}
+                <div className="mt-3 flex gap-2">
+                  {/* 复制文本按钮 */}
+                  <button
+                    onClick={async () => {
+                      const content = editorState.sections[0]?.content || '';
+                      if (!content.trim()) {
+                        showToast('暂无内容可复制', 'error');
+                        return;
+                      }
 
-                        try {
-                          const plainText = convertMarkdownToPlainText(content);
-                          await navigator.clipboard.writeText(plainText);
-                          showToast('已复制到剪贴板');
-                        } catch (err) {
-                          console.error('Failed to copy:', err);
-                          showToast('复制失败，请重试', 'error');
-                        }
-                      }}
-                      className="flex-1 px-4 py-2.5 bg-white/80 hover:bg-white/95
-                                 border border-gray-200/50 backdrop-blur-sm
-                                 rounded-xl transition-all duration-200
-                                 text-sm font-medium text-gray-700
-                                 flex items-center justify-center gap-2
-                                 shadow-sm hover:shadow-md
-                                 group relative">
-                      {/* 新的复制图标 */}
-                      <svg
-                        className="w-4 h-4 text-gray-600 group-hover:text-blue-500 transition-colors"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                      <span className="group-hover:text-blue-600 transition-colors">复制文本</span>
-                    </button>
+                      try {
+                        const plainText = convertMarkdownToPlainText(content);
+                        await navigator.clipboard.writeText(plainText);
+                        showToast('已复制到剪贴板');
+                      } catch (err) {
+                        console.error('Failed to copy:', err);
+                        showToast('复制失败，请重试', 'error');
+                      }
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-white/80 hover:bg-white/95
+                               border border-gray-200/50 backdrop-blur-sm
+                               rounded-xl transition-all duration-200
+                               text-sm font-medium text-gray-700
+                               flex items-center justify-center gap-2
+                               shadow-sm hover:shadow-md
+                               group relative">
+                    <svg
+                      className="w-4 h-4 text-gray-600 group-hover:text-blue-500 transition-colors"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span className="group-hover:text-blue-600 transition-colors">复制文本</span>
+                  </button>
 
-                    {/* 下载图片按钮 - 保持原有样式但稍作调整以保持一致性 */}
-                    <button
-                      onClick={() => {
-                        const content = editorState.sections[0]?.content || '';
-                        if (!content.trim()) {
-                          showToast('暂无内容可下载', 'error');
-                          return;
-                        }
-                        handleDownload('png');
-                      }}
-                      className="flex-1 px-4 py-2.5
-                                 bg-gradient-to-r from-blue-500 to-purple-500
-                                 hover:from-blue-600 hover:to-purple-600
-                                 text-white rounded-xl transition-all duration-200
-                                 text-sm font-medium shadow-sm hover:shadow-md
-                                 flex items-center justify-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                        />
-                      </svg>
-                      下载图片
-                    </button>
-                  </div>
+                  {/* 下载图片按钮 */}
+                  <button
+                    onClick={() => {
+                      const content = editorState.sections[0]?.content || '';
+                      if (!content.trim()) {
+                        showToast('暂无内容可下载', 'error');
+                        return;
+                      }
+                      handleDownload('png');
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500
+                               hover:from-blue-600 hover:to-purple-600
+                               text-white rounded-xl transition-all duration-200
+                               text-sm font-medium shadow-sm hover:shadow-md
+                               flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                    <span>下载图片</span>
+                  </button>
                 </div>
               </div>
             </div>
