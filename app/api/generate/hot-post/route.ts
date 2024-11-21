@@ -128,9 +128,9 @@ ${additionalInfo ? `补充：${additionalInfo}` : ''}
 
       transform(chunk, controller) {
         try {
-          console.log('[Edge] Processing chunk:', new Date().toISOString(), 'Size:', chunk.length);
+          // console.log('[Edge] Processing chunk:', new Date().toISOString(), 'Size:', chunk.length);
           const text = new TextDecoder().decode(chunk);
-          console.log('Raw chunk:', text);
+          // console.log('Raw chunk:', text);
 
           (this as any).buffer += text;
           const lines = (this as any).buffer.split('\n');
