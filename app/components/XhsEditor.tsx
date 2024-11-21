@@ -395,7 +395,7 @@ const XhsEditor = () => {
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* 标题区域 - 优化居中效果 */}
-          <header className="mb-8 text-center">
+          <header className="mb-12 mt-8 text-center">
             {/* 主标题 - 优化布局和间距 */}
             <h1 className="flex flex-col items-center justify-center mb-4">
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">

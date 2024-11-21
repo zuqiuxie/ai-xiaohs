@@ -110,7 +110,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                   <textarea
                     value={content}
                     onChange={e => onContentChange?.(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/50 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[300px] resize-none"
+                    className="w-full px-3 py-2 bg-white/50 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[432px] resize-none"
                     style={{ fontSize: contentSize, lineHeight: '1.6' }}
                     placeholder="输入内容..."
                   />
