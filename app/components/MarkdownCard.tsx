@@ -47,32 +47,32 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
       <div
         ref={ref}
         data-card
-        className="w-[360px] min-h-[480px] max-h-[480px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none relative group"
-        style={{ backgroundColor }}
-      >
+        className="w-[360px] min-h-[512px] max-h-[512px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none relative group"
+        style={{ backgroundColor }}>
         <button
           onClick={() => setIsEditing(!isEditing)}
           className="absolute top-2 right-2 p-2 bg-white/80 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-white"
-          title={isEditing ? '完成编辑' : '编辑内容'}
-        >
+          title={isEditing ? '完成编辑' : '编辑内容'}>
           {isEditing ? (
             <svg className="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           ) : (
             <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              />
             </svg>
           )}
         </button>
 
         <div className="p-6">
-          <div
-            className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm"
-            style={{ fontFamily: font }}
-          >
+          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm" style={{ fontFamily: font }}>
             {!content && !isEditing ? (
-              <div className="h-[400px] flex flex-col items-center justify-center text-gray-400 space-y-4">
+              <div className="h-[432px] flex flex-col items-center justify-center text-gray-400 space-y-4">
                 <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M9.5 3H5.5C4.11929 3 3 4.11929 3 5.5V9.5C3 10.8807 4.11929 12 5.5 12H9.5C10.8807 12 12 10.8807 12 9.5V5.5C12 4.11929 10.8807 3 9.5 3Z"
@@ -109,7 +109,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                 {isEditing ? (
                   <textarea
                     value={content}
-                    onChange={(e) => onContentChange?.(e.target.value)}
+                    onChange={e => onContentChange?.(e.target.value)}
                     className="w-full px-3 py-2 bg-white/50 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[300px] resize-none"
                     style={{ fontSize: contentSize, lineHeight: '1.6' }}
                     placeholder="输入内容..."
@@ -224,8 +224,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                           {children}
                         </em>
                       ),
-                    }}
-                  >
+                    }}>
                     {content}
                   </ReactMarkdown>
                 )}

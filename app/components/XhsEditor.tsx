@@ -559,7 +559,7 @@ const XhsEditor = () => {
 
             {/* 右侧预览区 */}
             <div className="lg:col-span-2">
-              <div className="sticky top-6">
+              <div className="top-6">
                 {/* 预览卡片容器 */}
                 <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/80 p-4">
                   {/* 预览标题 */}
@@ -588,72 +588,70 @@ const XhsEditor = () => {
                     </div>
                   </div>
 
-                    {/* 操作按钮组 两端对齐 */}
-                <div className="mt-4 px-4 flex gap-3">
-                  {/* 复制文本按钮 */}
-                  <button
-                    onClick={async () => {
-                      const content = editorState.sections[0]?.content || '';
-                      if (!content.trim()) {
-                        showToast('暂无内容可复制', 'error');
-                        return;
-                      }
+                  {/* 操作按钮组 两端对齐 */}
+                  <div className="mt-4 px-4 flex gap-3">
+                    {/* 复制文本按钮 */}
+                    <button
+                      onClick={async () => {
+                        const content = editorState.sections[0]?.content || '';
+                        if (!content.trim()) {
+                          showToast('暂无内容可复制', 'error');
+                          return;
+                        }
 
-                      try {
-                        const plainText = convertMarkdownToPlainText(content);
-                        await navigator.clipboard.writeText(plainText);
-                        showToast('已复制到剪贴板');
-                      } catch (err) {
-                        console.error('Failed to copy:', err);
-                        showToast('复制失败，请重试', 'error');
-                      }
-                    }}
-                    className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100
+                        try {
+                          const plainText = convertMarkdownToPlainText(content);
+                          await navigator.clipboard.writeText(plainText);
+                          showToast('已复制到剪贴板');
+                        } catch (err) {
+                          console.error('Failed to copy:', err);
+                          showToast('复制失败，请重试', 'error');
+                        }
+                      }}
+                      className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100
                                rounded-lg transition-all duration-200
                                text-sm font-medium text-gray-700
                                flex items-center justify-center gap-2">
-                    <svg
-                      className="w-4 h-4 text-gray-600"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    <span>复制文本</span>
-                  </button>
+                      <svg
+                        className="w-4 h-4 text-gray-600"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span>复制文本</span>
+                    </button>
 
-                  {/* 下载图片按钮 */}
-                  <button
-                    onClick={() => {
-                      const content = editorState.sections[0]?.content || '';
-                      if (!content.trim()) {
-                        showToast('暂无内容可下载', 'error');
-                        return;
-                      }
-                      handleDownload('png');
-                    }}
-                    className="flex-1 px-4 py-2.5
+                    {/* 下载图片按钮 */}
+                    <button
+                      onClick={() => {
+                        const content = editorState.sections[0]?.content || '';
+                        if (!content.trim()) {
+                          showToast('暂无内容可下载', 'error');
+                          return;
+                        }
+                        handleDownload('png');
+                      }}
+                      className="flex-1 px-4 py-2.5
                                bg-gradient-to-r from-blue-500 to-purple-500
                                hover:from-blue-600 hover:to-purple-600
                                text-white rounded-lg transition-all duration-200
                                text-sm font-medium
                                flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                    <span>下载图片</span>
-                  </button>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                      <span>下载图片</span>
+                    </button>
+                  </div>
                 </div>
-                </div>
-
-
               </div>
             </div>
           </div>
