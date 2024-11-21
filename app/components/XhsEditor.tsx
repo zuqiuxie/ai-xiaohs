@@ -462,8 +462,8 @@ const XhsEditor = () => {
               {/* 样式设置区 */}
               <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-3">
                 <div className="grid grid-cols-12 gap-3">
-                  {/* 字体选择 */}
-                  <div className="col-span-5">
+                  {/* 字体选择 - 从 col-span-5 改为 col-span-4 */}
+                  <div className="col-span-4">
                     <select
                       value={editorState.font}
                       onChange={e => handleStyleChange('font', e.target.value)}
@@ -481,8 +481,8 @@ const XhsEditor = () => {
                     </select>
                   </div>
 
-                  {/* 字号选择 */}
-                  <div className="col-span-3">
+                  {/* 字号选择 - 从 col-span-3 改为 col-span-2 */}
+                  <div className="col-span-2">
                     <select
                       value={editorState.fontSize}
                       onChange={e => handleStyleChange('fontSize', e.target.value)}
@@ -497,7 +497,7 @@ const XhsEditor = () => {
                   </div>
 
                   {/* 背景色选择 */}
-                  <div className="col-span-4 flex items-center gap-1">
+                  <div className="col-span-6 flex items-center gap-1">
                     {[
                       { color: '#E6F7F3', name: '薄荷' },
                       { color: '#F3E6FF', name: '梦幻' },
@@ -505,6 +505,11 @@ const XhsEditor = () => {
                       { color: '#E6F0FF', name: '天空' },
                       { color: '#FFE6E6', name: '樱花' },
                       { color: '#F5F5F5', name: '简约' },
+                      { color: '#F8E6FF', name: '紫晶' },
+                      { color: '#FFFBE6', name: '柠檬' },
+                      { color: '#FFE8E6', name: '珊瑚' },
+                      { color: '#EEF7E6', name: '抹茶' },    // 新增：清新的抹茶绿
+                      { color: '#E6E6FF', name: '晴空' },    // 新增：温柔的蓝紫色
                     ].map(({ color, name }) => (
                       <button
                         key={color}
