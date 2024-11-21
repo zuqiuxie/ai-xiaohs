@@ -65,7 +65,7 @@ const GRADIENT_TEXT = `
 
 const XhsEditor = () => {
   const [editorState, setEditorState] = useState<EditorState>({
-    template: 'ai',
+    template: 'hot_post',
     title: '',
     font: '思源黑体',
     fontSize: '16px',
