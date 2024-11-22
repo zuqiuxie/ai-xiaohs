@@ -4,13 +4,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Header() {
-  // 添加状态来控制背景色
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
 
-  // 监听滚动事件
   useEffect(() => {
     const handleScroll = () => {
-      // 只要有滚动就显示背景色
       const shouldShowBackground = window.scrollY > 0;
       setIsScrolled(shouldShowBackground);
     };
@@ -22,7 +20,7 @@ export default function Header() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const headerOffset = 80; // 头部高度补偿
+      const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset + 50;
 
@@ -74,6 +72,33 @@ export default function Header() {
               className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
               常见问题
             </button>
+
+            {/* 新增联系我们入口 */}
+            <div className="relative">
+              <button
+                onMouseEnter={() => setShowQRCode(true)}
+                onMouseLeave={() => setShowQRCode(false)}
+                className="px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500
+                         text-white text-sm font-medium transition-all duration-300
+                         hover:shadow-lg hover:scale-105 active:scale-95">
+                联系我们
+              </button>
+
+              {/* 悬浮二维码 */}
+              {showQRCode && (
+                <div className="absolute right-0 mt-2 p-3 bg-white rounded-lg shadow-xl border border-gray-100">
+                  <div className="relative w-32 h-32">
+                    <Image
+                      src="/wechat.jpg"
+                      alt="微信二维码"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-center text-gray-500">扫码添加微信</p>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </div>
