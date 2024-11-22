@@ -41,7 +41,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
       }
     };
 
-    console.log('MarkdownCard rendering with content:', content);
+    // console.log('MarkdownCard rendering with content:', content);
 
     return (
       <div
