@@ -47,7 +47,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
       <div
         ref={ref}
         data-card
-        className="w-[360px] min-h-[512px] max-h-[512px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none relative group"
+        className="w-full sm:w-[360px] min-h-[512px] max-h-[512px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none relative group"
         style={{ backgroundColor }}>
         <button
           onClick={() => setIsEditing(!isEditing)}

@@ -56,21 +56,21 @@ export default function Header() {
           </div>
 
           {/* 右侧导航区域 */}
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-3 sm:gap-8">
             <button
               onClick={() => scrollToSection('features')}
-              className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
-              功能特点
+              className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
+              功能
             </button>
             <button
               onClick={() => scrollToSection('guide')}
-              className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
-              使用说明
+              className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
+              说明
             </button>
             <button
               onClick={() => scrollToSection('faq')}
-              className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
-              常见问题
+              className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
+              问答
             </button>
 
             {/* 新增联系我们入口 */}
@@ -78,8 +78,8 @@ export default function Header() {
               <button
                 onMouseEnter={() => setShowQRCode(true)}
                 onMouseLeave={() => setShowQRCode(false)}
-                className="px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500
-                         text-white text-sm font-medium transition-all duration-300
+                className="px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500
+                         text-white text-xs sm:text-sm font-medium transition-all duration-300
                          hover:shadow-lg hover:scale-105 active:scale-95">
                 联系我们
               </button>

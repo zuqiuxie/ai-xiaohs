@@ -429,8 +429,8 @@ const XhsEditor = () => {
             </div>
           </header>
 
-          {/* 主编辑区域 */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* 主编辑区域 - 优化移动端布局 */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
             {/* 左侧编辑区 */}
             <div className="lg:col-span-3 space-y-4">
               {/* 模板选择 */}
@@ -459,74 +459,83 @@ const XhsEditor = () => {
                 </div>
               </div>
 
-              {/* 样式设置区 */}
+              {/* 样式设置区 - 优化移动端布局 */}
               <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-3">
-                <div className="grid grid-cols-12 gap-3">
-                  {/* 字体选择 - 从 col-span-5 改为 col-span-4 */}
-                  <div className="col-span-4">
-                    <select
-                      value={editorState.font}
-                      onChange={e => handleStyleChange('font', e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                      {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
-                        <optgroup key={category} label={category}>
-                          {fonts.map(font => (
-                            <option key={font.label} value={font.value}>
-                              {font.label}
-                            </option>
-                          ))}
-                        </optgroup>
+                <div className="flex flex-col sm:grid sm:grid-cols-12 gap-3">
+                  {/* 字体和字号选择器在移动端并排显示 */}
+                  <div className="flex gap-2 sm:contents">
+                    {/* 字体选择 - 移动端占据更多空间 */}
+                    <div className="flex-1 sm:col-span-4">
+                      <select
+                        value={editorState.font}
+                        onChange={e => handleStyleChange('font', e.target.value)}
+                        className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                        {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
+                          <optgroup key={category} label={category}>
+                            {fonts.map(font => (
+                              <option key={font.label} value={font.value}>
+                                {font.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* 字号选择 - 移动端保持合适比例 */}
+                    <div className="w-24 sm:col-span-2">
+                      <select
+                        value={editorState.fontSize}
+                        onChange={e => handleStyleChange('fontSize', e.target.value)}
+                        className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                        <option value="14px">14px</option>
+                        <option value="15px">15px</option>
+                        <option value="16px">16px</option>
+                        <option value="18px">18px</option>
+                        <option value="20px">20px</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* 背景色选择 - 移动端优化 */}
+                  <div className="sm:col-span-6 mt-2 sm:mt-0">
+                    {/* 添加背景色标签 */}
+                    <div className="text-xs text-gray-500 mb-2 sm:hidden">背景色</div>
+                    {/* 改用网格布局展示颜色选项 */}
+                    <div className="grid grid-cols-6 sm:flex sm:items-center gap-2 sm:gap-1">
+                      {[
+                        { color: '#E6F7F3', name: '薄荷' },
+                        { color: '#F3E6FF', name: '梦幻' },
+                        { color: '#FFF3E6', name: '暖阳' },
+                        { color: '#E6F0FF', name: '天空' },
+                        { color: '#FFE6E6', name: '樱花' },
+                        { color: '#F5F5F5', name: '简约' },
+                        { color: '#F8E6FF', name: '紫晶' },
+                        { color: '#FFFBE6', name: '柠檬' },
+                        { color: '#FFE8E6', name: '珊瑚' },
+                        { color: '#EEF7E6', name: '抹茶' },
+                        { color: '#E6E6FF', name: '晴空' },
+                      ].map(({ color, name }) => (
+                        <button
+                          key={color}
+                          className={`group relative w-8 h-8 sm:w-6 sm:h-6 rounded-full transition-all duration-200 ${
+                            editorState.backgroundColor === color
+                              ? 'ring-2 ring-offset-1 ring-blue-500/30 scale-110'
+                              : 'hover:scale-110'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => handleStyleChange('backgroundColor', color)}>
+                          {/* 颜色名称提示 - 移动端显示在下方 */}
+                          <span
+                            className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500
+                                     opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {name}
+                          </span>
+                        </button>
                       ))}
-                    </select>
-                  </div>
-
-                  {/* 字号选择 - 从 col-span-3 改为 col-span-2 */}
-                  <div className="col-span-2">
-                    <select
-                      value={editorState.fontSize}
-                      onChange={e => handleStyleChange('fontSize', e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                      <option value="14px">14px</option>
-                      <option value="15px">15px</option>
-                      <option value="16px">16px</option>
-                      <option value="18px">18px</option>
-                      <option value="20px">20px</option>
-                    </select>
-                  </div>
-
-                  {/* 背景色选择 */}
-                  <div className="col-span-6 flex items-center gap-1">
-                    {[
-                      { color: '#E6F7F3', name: '薄荷' },
-                      { color: '#F3E6FF', name: '梦幻' },
-                      { color: '#FFF3E6', name: '暖阳' },
-                      { color: '#E6F0FF', name: '天空' },
-                      { color: '#FFE6E6', name: '樱花' },
-                      { color: '#F5F5F5', name: '简约' },
-                      { color: '#F8E6FF', name: '紫晶' },
-                      { color: '#FFFBE6', name: '柠檬' },
-                      { color: '#FFE8E6', name: '珊瑚' },
-                      { color: '#EEF7E6', name: '抹茶' },    // 新增：清新的抹茶绿
-                      { color: '#E6E6FF', name: '晴空' },    // 新增：温柔的蓝紫色
-                    ].map(({ color, name }) => (
-                      <button
-                        key={color}
-                        className={`group relative w-6 h-6 rounded-full transition-all duration-200 ${
-                          editorState.backgroundColor === color
-                            ? 'ring-2 ring-offset-1 ring-blue-500/30 scale-110'
-                            : 'hover:scale-110'
-                        }`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => handleStyleChange('backgroundColor', color)}>
-                        <span
-                          className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500
-                                       opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          {name}
-                        </span>
-                      </button>
-                    ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -562,11 +571,14 @@ const XhsEditor = () => {
               </div>
             </div>
 
-            {/* 右侧预览区 */}
+            {/* 右侧预览区 - 优化高度 */}
             <div className="lg:col-span-2">
+              {/* 调整最外层容器高度，移除固定最小高度 */}
               <div className="top-6">
-                {/* 预览卡片容器 */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/80 p-4">
+                {/* 预览卡片容器 - 调整高度和布局 */}
+                <div
+                  className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/80 p-4
+                               flex flex-col">
                   {/* 预览标题 */}
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-medium text-gray-600">预览效果</span>
@@ -577,9 +589,11 @@ const XhsEditor = () => {
                     </div>
                   </div>
 
-                  {/* 卡片内容 - 水平居中 */}
-                  <div className="flex justify-center">
-                    <div className="w-full max-w-[360px] relative rounded-lg overflow-hidden bg-gradient-to-b from-gray-50/50 to-white/50">
+                  {/* 卡片内容 - 调整高度和布局 */}
+                  <div className="flex justify-center items-start">
+                    <div
+                      className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
+                                  bg-gradient-to-b from-gray-50/50 to-white/50">
                       <MarkdownCard
                         ref={cardRef}
                         title={editorState.title}
@@ -593,8 +607,8 @@ const XhsEditor = () => {
                     </div>
                   </div>
 
-                  {/* 操作按钮组 两端对齐 */}
-                  <div className="mt-4 px-4 flex gap-3">
+                  {/* 操作按钮组 */}
+                  <div className="pt-4 px-2 sm:px-4 flex gap-2 sm:gap-3">
                     {/* 复制文本按钮 */}
                     <button
                       onClick={async () => {
