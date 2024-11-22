@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: '小红书图文生成器 - AI文案助手 | 一键生成精美卡片',
     description: '专业的小红书图文生成工具,支持AI文案创作、精美排版、一键导出。3分钟快速生成吸睛好文,助你轻松涨粉。',
-    url: 'https://your-domain.com',
+    url: 'https://www.xhscard.top/',
     siteName: '小红书图文生成器',
     images: [
       {

@@ -1,16 +1,19 @@
 import XhsEditor from './components/XhsEditor';
 import { IconBulb, IconShield, IconTool, IconMessage } from './components/Icons';
+import Header from './components/Header';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+      <Header />
+
       {/* 编辑器区域 */}
       <div className="relative">
         <XhsEditor />
       </div>
 
       {/* 功能特点 - 减小上方间距 */}
-      <div className="relative px-4 py-16">
+      <div className="relative px-4 py-16" id="features">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">强大的创作功能</h2>
           <p className="text-gray-600 text-center mb-16 max-w-2xl mx-auto">
@@ -27,7 +30,7 @@ export default function Home() {
       </div>
 
       {/* 使用说明 - 重新设计 */}
-      <div className="relative py-16 bg-white/40">
+      <div className="relative py-16 bg-white/40" id="guide">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">使用说明</h2>
           <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">两种模式，满足不同创作需求</p>
@@ -66,7 +69,7 @@ export default function Home() {
       </div>
 
       {/* 常见问题 - 减小上方间距 */}
-      <div className="relative px-4 py-16">
+      <div className="relative px-4 py-16" id="faq">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">常见问题</h2>
           <p className="text-gray-600 text-center mb-16 max-w-2xl mx-auto">解答您的疑惑，让创作更顺畅</p>
@@ -87,7 +90,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
     </div>
   );
 }
