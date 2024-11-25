@@ -101,7 +101,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                 </svg>
                 <div className="text-center space-y-1">
                   <p className="text-sm font-medium">等待生成内容</p>
-                  <p className="text-xs">请在左侧输入主题，点击"AI 生成内容"按钮</p>
+                  <p className="text-xs">请在左侧输入配置信息，点击按钮生成内容</p>
                 </div>
               </div>
             ) : (

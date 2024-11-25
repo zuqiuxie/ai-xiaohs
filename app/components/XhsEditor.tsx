@@ -528,11 +528,11 @@ const XhsEditor = () => {
                           style={{ backgroundColor: color }}
                           onClick={() => handleStyleChange('backgroundColor', color)}>
                           {/* 颜色名称提示 - 移动端显示在下方 */}
-                          <span
+                          {/* <span
                             className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500
                                      opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             {name}
-                          </span>
+                          </span> */}
                         </button>
                       ))}
                     </div>
