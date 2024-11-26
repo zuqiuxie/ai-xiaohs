@@ -523,8 +523,8 @@ const XhsEditor = () => {
                           name: '清新绿',
                         },
                         {
-                          from: '#fbc2eb',
-                          to: '#a6c1ee',
+                          from: '#FF9ACD',  // 修改浪漫粉，更偏粉色调
+                          to: '#F2C1EA',
                           name: '浪漫粉',
                         },
                         {
@@ -548,8 +548,8 @@ const XhsEditor = () => {
                           name: '樱花粉',
                         },
                         {
-                          from: '#e0c3fc',
-                          to: '#8ec5fc',
+                          from: '#B066FF',  // 修改幻彩紫，更深的紫色调
+                          to: '#986EFF',
                           name: '幻彩紫',
                         },
                         {
