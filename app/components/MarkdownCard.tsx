@@ -11,7 +11,7 @@ interface MarkdownCardProps {
   content: string;
   font: string;
   fontSize: string;
-  backgroundColor: string;
+  backgroundColor: { from: string; to: string };
   onContentChange?: (content: string) => void;
   onTitleChange?: (title: string) => void;
   onDownload?: () => void;
@@ -20,35 +20,23 @@ interface MarkdownCardProps {
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
   ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange, onDownload }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
     const contentSize = fontSize;
     const h1Size = `${parseInt(fontSize) + 4}px`;
     const h2Size = `${parseInt(fontSize) + 2}px`;
     const h3Size = `${parseInt(fontSize) + 1}px`;
 
-    const handleCopy = async () => {
-      try {
-        const textToCopy = `${onTitleChange?.(content)}\n\n${content}`;
-        await navigator.clipboard.writeText(textToCopy);
-        setCopyStatus('copied');
 
-        setTimeout(() => {
-          setCopyStatus('idle');
-        }, 3000);
-      } catch (err) {
-        console.error('Failed to copy text:', err);
-        alert('复制失败，请重试');
-      }
-    };
 
-    // console.log('MarkdownCard rendering with content:', content);
 
     return (
       <div
         ref={ref}
         data-card
         className="w-full sm:w-[360px] min-h-[512px] max-h-[512px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none relative group"
-        style={{ backgroundColor }}>
+        style={{
+          background: `linear-gradient(135deg, ${backgroundColor.from} 0%, ${backgroundColor.to} 100%)`
+          // 使用 135deg 对角线渐变，从左上到右下
+        }}>
         <button
           onClick={() => setIsEditing(!isEditing)}
           className="absolute top-2 right-2 p-2 bg-white/80 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-white"

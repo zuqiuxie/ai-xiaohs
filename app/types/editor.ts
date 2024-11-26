@@ -11,6 +11,9 @@ export interface EditorState {
   title: string
   font: string
   fontSize: string
-  backgroundColor: string
+  backgroundColor: {
+    from: string
+    to: string
+  }
   sections: Section[]
 }

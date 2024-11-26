@@ -69,7 +69,10 @@ const XhsEditor = () => {
     title: '',
     font: '思源黑体',
     fontSize: '16px',
-    backgroundColor: '#E6F7F3',
+    backgroundColor: {
+      from: '#a6c1ee',
+      to: '#fbc2eb',
+    },
     sections: [{ ...defaultSection }],
   });
 
@@ -149,7 +152,7 @@ const XhsEditor = () => {
       clone.style.maxHeight = 'none';
       clone.style.transform = 'none';
       clone.style.position = 'static';
-      clone.style.backgroundColor = editorState.backgroundColor;
+      clone.style.background = `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`;
 
       // 4. 处理内容样式
       const contentCards = clone.querySelectorAll('.bg-white\\/60');
@@ -301,12 +304,15 @@ const XhsEditor = () => {
   };
 
   // 在样式改变时记录
-  const handleStyleChange = (type: 'font' | 'fontSize' | 'backgroundColor', value: string) => {
+  const handleStyleChange = (
+    type: 'font' | 'fontSize' | 'backgroundColor',
+    value: string | { from: string; to: string }
+  ) => {
     setEditorState(prev => ({ ...prev, [type]: value }));
 
     trackEvent('change_style', {
       style_type: type,
-      style_value: value,
+      style_value: typeof value === 'string' ? value : `${value.from}-${value.to}`,
       timestamp: new Date().toISOString(),
     });
   };
@@ -506,34 +512,69 @@ const XhsEditor = () => {
                     {/* 改用网格布局展示颜色选项 */}
                     <div className="grid grid-cols-6 sm:flex sm:items-center gap-2 sm:gap-1">
                       {[
-                        { color: '#E6F7F3', name: '薄荷' },
-                        { color: '#F3E6FF', name: '梦幻' },
-                        { color: '#FFF3E6', name: '暖阳' },
-                        { color: '#E6F0FF', name: '天空' },
-                        { color: '#FFE6E6', name: '樱花' },
-                        { color: '#F5F5F5', name: '简约' },
-                        { color: '#F8E6FF', name: '紫晶' },
-                        { color: '#FFFBE6', name: '柠檬' },
-                        { color: '#FFE8E6', name: '珊瑚' },
-                        { color: '#EEF7E6', name: '抹茶' },
-                        { color: '#E6E6FF', name: '晴空' },
-                      ].map(({ color, name }) => (
+                        {
+                          from: '#a6c1ee',
+                          to: '#fbc2eb',
+                          name: '梦幻紫',
+                        },
+                        {
+                          from: '#84fab0',
+                          to: '#8fd3f4',
+                          name: '清新绿',
+                        },
+                        {
+                          from: '#fbc2eb',
+                          to: '#a6c1ee',
+                          name: '浪漫粉',
+                        },
+                        {
+                          from: '#a1c4fd',
+                          to: '#c2e9fb',
+                          name: '天空蓝',
+                        },
+                        {
+                          from: '#d4fc79',
+                          to: '#96e6a1',
+                          name: '薄荷绿',
+                        },
+                        {
+                          from: '#ffecd2',
+                          to: '#fcb69f',
+                          name: '暖阳橙',
+                        },
+                        {
+                          from: '#ff9a9e',
+                          to: '#fecfef',
+                          name: '樱花粉',
+                        },
+                        {
+                          from: '#e0c3fc',
+                          to: '#8ec5fc',
+                          name: '幻彩紫',
+                        },
+                        {
+                          from: '#89f7fe',
+                          to: '#66a6ff',
+                          name: '海洋蓝',
+                        },
+                        {
+                          from: '#96fbc4',
+                          to: '#f9f586',
+                          name: '森林绿',
+                        },
+                      ].map(({ from, to, name }) => (
                         <button
-                          key={color}
+                          key={`${from}-${to}`}
                           className={`group relative w-8 h-8 sm:w-6 sm:h-6 rounded-full transition-all duration-200 ${
-                            editorState.backgroundColor === color
+                            editorState.backgroundColor.from === from && editorState.backgroundColor.to === to
                               ? 'ring-2 ring-offset-1 ring-blue-500/30 scale-110'
                               : 'hover:scale-110'
                           }`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => handleStyleChange('backgroundColor', color)}>
-                          {/* 颜色名称提示 - 移动端显示在下方 */}
-                          {/* <span
-                            className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500
-                                     opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            {name}
-                          </span> */}
-                        </button>
+                          style={{
+                            background: `linear-gradient(135deg, ${from}, ${to})`,
+                          }}
+                          onClick={() => handleStyleChange('backgroundColor', { from, to })}
+                          title={name}></button>
                       ))}
                     </div>
                   </div>
