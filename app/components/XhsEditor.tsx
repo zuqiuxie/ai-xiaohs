@@ -126,7 +126,12 @@ const XhsEditor = () => {
     }));
   };
 
-  // 下载函数
+  // 添加检测设备类型的辅助函数
+  const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
+  // 修改下载函数
   const handleDownload = async (format: 'png' | 'jpg' | 'jpeg') => {
     if (!cardRef.current) return;
 
@@ -276,23 +281,93 @@ const XhsEditor = () => {
         },
       });
 
-      // 9. 下载图片
-      const link = document.createElement('a');
-      link.download = `小红书卡片_${Date.now()}.${format}`;
-      link.href = canvas.toDataURL(`image/${format}`, 1.0);
-      link.click();
+      // 获取图片的 base64 数据
+      const imageData = canvas.toDataURL(`image/${format}`, 1.0);
 
-      // 10. 清理临时元素
+      if (isMobile()) {
+        try {
+          // 尝试使用 Web Share API
+          const blob = await (await fetch(imageData)).blob();
+          const file = new File([blob], `小红书卡片_${Date.now()}.${format}`, { type: `image/${format}` });
+
+          if (navigator.share && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: '保存小红书卡片',
+            });
+          } else {
+            // 回退方案：创建临时 a 标签并触发点击
+            const a = document.createElement('a');
+            a.href = imageData;
+            a.download = `小红书卡片_${Date.now()}.${format}`;
+
+            // 添加样式使其覆盖整个屏幕
+            a.style.position = 'fixed';
+            a.style.top = '0';
+            a.style.left = '0';
+            a.style.width = '100%';
+            a.style.height = '100%';
+            a.style.zIndex = '9999';
+            a.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            a.style.display = 'flex';
+            a.style.alignItems = 'center';
+            a.style.justifyContent = 'center';
+            a.style.flexDirection = 'column';
+
+            // 创建图片预览
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.style.maxWidth = '90%';
+            img.style.maxHeight = '70vh';
+            img.style.objectFit = 'contain';
+            img.style.borderRadius = '12px';
+            a.appendChild(img);
+
+            // 添加提示文本
+            const text = document.createElement('p');
+            text.textContent = '长按图片保存到相册';
+            text.style.color = 'white';
+            text.style.marginTop = '20px';
+            text.style.fontSize = '16px';
+            a.appendChild(text);
+
+            // 添加关闭按钮
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '关闭';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '20px';
+            closeBtn.style.right = '20px';
+            closeBtn.style.padding = '8px 16px';
+            closeBtn.style.backgroundColor = 'rgba(255,255,255,0.2)';
+            closeBtn.style.border = 'none';
+            closeBtn.style.borderRadius = '20px';
+            closeBtn.style.color = 'white';
+            closeBtn.style.fontSize = '14px';
+            closeBtn.onclick = e => {
+              e.preventDefault();
+              document.body.removeChild(a);
+            };
+            a.appendChild(closeBtn);
+
+            document.body.appendChild(a);
+          }
+        } catch (error) {
+          console.error('Mobile save failed:', error);
+          showToast('保存失败，请重试', 'error');
+        }
+      } else {
+        // 桌面端直接下载
+        const link = document.createElement('a');
+        link.download = `小红书卡片_${Date.now()}.${format}`;
+        link.href = imageData;
+        link.click();
+        showToast('下载成功');
+      }
+      // 删除临时容器
       document.body.removeChild(tempContainer);
-
-      // 记录下载事件
-      trackEvent('download_image', {
-        format,
-        template_type: editorState.template,
-        timestamp: new Date().toISOString(),
-      });
     } catch (error) {
       console.error('下载失败:', error);
+      showToast('下载失败，请重试', 'error');
     }
   };
 
@@ -523,8 +598,8 @@ const XhsEditor = () => {
                           name: '清新绿',
                         },
                         {
-                          from: '#FF9ACD',  // 修改浪漫粉，更偏粉色调
-                          to: '#F2C1EA',
+                          from: '#fbc2eb',
+                          to: '#a6c1ee',
                           name: '浪漫粉',
                         },
                         {
@@ -548,8 +623,8 @@ const XhsEditor = () => {
                           name: '樱花粉',
                         },
                         {
-                          from: '#B066FF',  // 修改幻彩紫，更深的紫色调
-                          to: '#986EFF',
+                          from: '#e0c3fc',
+                          to: '#8ec5fc',
                           name: '幻彩紫',
                         },
                         {
