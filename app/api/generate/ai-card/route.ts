@@ -44,19 +44,21 @@ export async function POST(req: Request) {
         content: `你是一位深谙小红书爆款笔记创作的资深博主。请根据用户输入的主题，生成一篇吸引人的小红书笔记。
 
 创作格式：
-1. 开头部分：
+1. 标题要求：
    - 基于用户输入的主题，生成吸引眼球的标题
    - 标题字数控制在20字符以内(包含emoji)
    - 标题需包含1-2个emoji，放在开头或结尾
+   - 标题文字要制造好奇心，吸引点击
+   - 善用"我发现""绝了""原来""终于""必须收藏"等爆款标题关键词
    - 标题中不要包含"标题："字样
-   - 标题要有爆点，制造好奇心
 
 2. 内容结构：
    - 开头要吸引眼球，用简短有力的文案hook住读者
-   - 分3个核心要点展开，每个要点：
-     * 直接用emoji(🔍💡✨📌💫🌟💎🎯⭐️🔆)加要点名称
-     * 不要添加"核心要点x："等前缀
-     * 直接写要点名称，不用标序号
+   - 分3个核心要点展开，每个要点格式：
+     * emoji(🔍💡✨📌💫🌟💎🎯⭐️🔆) + 要点名称（直接写名称，严禁使用"核心要点x："等任何形式的序号或前缀）
+     * 示例：
+       "✨ 选择合适主题"
+       "🔍 深入理解原理"
      * 内容详实但简洁，避免废话
    - 文风要求：
      * 亲和力强的对话式表达，像在跟好朋友分享
@@ -68,9 +70,9 @@ export async function POST(req: Request) {
 - 内容字数控制在200字以内
 - 内容要有价值和可操作性
 - 避免过度营销感和虚假信息
-- 适量使用标点符号增强表达力（❗️、❓、～）
 - 注意性别中立的表达方式，内容要适合所有用户群体
-- 不要输出"标题："和"正文："等标记文字`,
+- 不要输出"标题："和"正文："等标记文字
+- 严格禁止在要点前添加任何形式的序号或"核心要点x："等前缀`,
       },
       ...messages,
     ];
@@ -112,11 +114,13 @@ export async function POST(req: Request) {
               const parsed = JSON.parse(data);
               const content = parsed.choices?.[0]?.delta?.content || '';
               if (content) {
-                controller.enqueue(`data: ${JSON.stringify({
-                  content,
-                  done: false,
-                  isPartial: true
-                })}\n\n`);
+                controller.enqueue(
+                  `data: ${JSON.stringify({
+                    content,
+                    done: false,
+                    isPartial: true,
+                  })}\n\n`
+                );
               }
             } catch (e) {
               console.error('Parse error:', e, 'Line:', line);
@@ -149,12 +153,10 @@ export async function POST(req: Request) {
         if ((this as any).buffer) {
           (this as any).processLine((this as any).buffer);
         }
-      }
+      },
     });
 
-    const stream = response.body
-      ?.pipeThrough(transformStream)
-      ?.pipeThrough(new TextEncoderStream());
+    const stream = response.body?.pipeThrough(transformStream)?.pipeThrough(new TextEncoderStream());
 
     if (!stream) {
       throw new Error('Failed to create stream');
@@ -164,7 +166,7 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'X-Accel-Buffering': 'no',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -175,7 +177,7 @@ export async function POST(req: Request) {
     console.error('[Edge] Generation error:', {
       timestamp: new Date().toISOString(),
       error: error instanceof Error ? error.message : 'Unknown error',
-      type: error instanceof Error ? error.name : 'Unknown type'
+      type: error instanceof Error ? error.name : 'Unknown type',
     });
     return new Response(
       JSON.stringify({

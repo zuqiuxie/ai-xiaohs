@@ -173,8 +173,8 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
           {/* 生成按钮 */}
           <button
             onClick={generateContent}
-            className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600
-                     hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl
+            className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500
+                     hover:from-blue-600 hover:to-purple-600 text-white rounded-xl
                      transition-all duration-200 flex items-center justify-center
                      gap-2 shadow-sm hover:shadow-md disabled:opacity-50
                      disabled:cursor-not-allowed font-medium"
