@@ -29,6 +29,14 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
     const h3Size = `${parseInt(fontSize) + 1}px`;
 
     useEffect(() => {
+      if (ref && typeof ref === 'function') {
+        ref(cardRef.current);
+      } else if (ref && cardRef.current) {
+        (ref as React.MutableRefObject<HTMLDivElement>).current = cardRef.current;
+      }
+    }, [ref]);
+
+    useEffect(() => {
       if (!content || !cardRef.current || !contentRef.current) return;
 
       const card = cardRef.current;
