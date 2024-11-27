@@ -44,6 +44,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="zh-CN">
       <head>
         <link rel="canonical" href="https://www.xhscard.top/" />
+         {/* 添加手写风格字体 */}
+         <link
+          href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&family=Zhi+Mang+Xing&family=Caveat&family=Dancing+Script&display=swap"
+          rel="stylesheet"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
