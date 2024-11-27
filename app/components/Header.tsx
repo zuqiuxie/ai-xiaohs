@@ -26,7 +26,7 @@ export default function Header() {
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -37,21 +37,14 @@ export default function Header() {
         isScrolled
           ? 'backdrop-blur-sm bg-gradient-to-br from-rose-50/80 via-purple-50/80 to-blue-50/80 border-b border-gray-100'
           : 'bg-transparent'
-      }`}
-    >
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* 左侧 Logo 区域 */}
           <div className="flex items-center gap-2">
-            <Image
-              src="/favicon.ico"
-              alt="Logo"
-              width={24}
-              height={24}
-              className="w-6 h-6"
-            />
+            <Image src="/favicon.ico" alt="Logo" width={24} height={24} className="w-6 h-6" />
             <span className="text-lg font-medium bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              妙写
+              文灵AI
             </span>
           </div>
 
@@ -88,19 +81,14 @@ export default function Header() {
                 className="px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500
                          text-white text-xs sm:text-sm font-medium transition-all duration-300
                          hover:shadow-lg hover:scale-105 active:scale-95">
-                联系我们
+                联系我
               </button>
 
               {/* 悬浮二维码 */}
               {showQRCode && (
                 <div className="absolute right-0 mt-2 p-3 bg-white rounded-lg shadow-xl border border-gray-100">
                   <div className="relative w-32 h-32">
-                    <Image
-                      src="/wechat.jpg"
-                      alt="微信二维码"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
+                    <Image src="/wechat.jpg" alt="微信二维码" fill className="object-cover rounded-lg" />
                   </div>
                   <p className="mt-2 text-xs text-center text-gray-500">扫码添加微信</p>
                 </div>
