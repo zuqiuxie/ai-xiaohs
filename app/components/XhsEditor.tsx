@@ -26,30 +26,7 @@ const FONT_OPTIONS = {
     { label: '阿里巴巴普惠体', value: '"Alibaba PuHuiTi", sans-serif' },
     { label: '霞鹜楷', value: '"LXGW WenKai", serif' },
     { label: '楷体', value: 'KaiTi, STKaiti, serif' },
-    // { label: '汇文明朝体', value: '"Huiwen Mincho", serif' },
-    // { label: '站酷高端黑', value: '"ZCOOL QingKe HuangYou", sans-serif' },
-    // { label: '方正兰亭黑', value: '"FZLanTingHei", sans-serif' },
   ],
-  // 中文传统: [
-
-  //   { label: '宋体', value: 'SimSun, serif' },
-  //   { label: '黑体', value: 'SimHei, sans-serif' },
-  //   { label: '仿宋', value: 'FangSong, STFangSong, serif' },
-  // ],
-  // 英文现代: [
-  //   { label: 'Inter', value: '"Inter", sans-serif' },
-  //   { label: 'Roboto', value: '"Roboto", sans-serif' },
-  //   { label: 'Open Sans', value: '"Open Sans", sans-serif' },
-  //   { label: 'Montserrat', value: '"Montserrat", sans-serif' },
-  //   { label: 'Poppins', value: '"Poppins", sans-serif' },
-  // ],
-  // 英文经典: [
-  //   { label: 'Playfair Display', value: '"Playfair Display", serif' },
-  //   { label: 'Merriweather', value: '"Merriweather", serif' },
-  //   { label: 'Lora', value: '"Lora", serif' },
-  //   { label: 'Crimson Pro', value: '"Crimson Pro", serif' },
-  //   { label: 'Garamond', value: '"EB Garamond", serif' },
-  // ],
   手写风格: [
     { label: '手写体', value: '"Ma Shan Zheng", cursive' },
     { label: '潇洒体', value: '"Liu Jian Mao Cao", cursive' },
@@ -72,8 +49,10 @@ const XhsEditor = () => {
     font: '思源黑体',
     fontSize: '16px',
     backgroundColor: {
-      from: '#a6c1ee',
-      to: '#fbc2eb',
+      // from: '#a6c1ee',
+      // to: '#fbc2eb',
+      from: '#fbc2eb',
+      to: '#a6c1ee',
     },
     sections: [{ ...defaultSection }],
   });
@@ -590,9 +569,9 @@ const XhsEditor = () => {
                     <div className="grid grid-cols-6 sm:flex sm:items-center gap-2 sm:gap-1">
                       {[
                         {
-                          from: '#a6c1ee',
-                          to: '#fbc2eb',
-                          name: '梦幻紫',
+                          from: '#fbc2eb',
+                          to: '#a6c1ee',
+                          name: '浪漫粉',
                         },
                         {
                           from: '#84fab0',
@@ -600,19 +579,9 @@ const XhsEditor = () => {
                           name: '清新绿',
                         },
                         {
-                          from: '#fbc2eb',
-                          to: '#a6c1ee',
-                          name: '浪漫粉',
-                        },
-                        {
                           from: '#a1c4fd',
                           to: '#c2e9fb',
                           name: '天空蓝',
-                        },
-                        {
-                          from: '#d4fc79',
-                          to: '#96e6a1',
-                          name: '薄荷绿',
                         },
                         {
                           from: '#ffecd2',
@@ -625,19 +594,30 @@ const XhsEditor = () => {
                           name: '樱花粉',
                         },
                         {
-                          from: '#e0c3fc',
-                          to: '#8ec5fc',
-                          name: '幻彩紫',
-                        },
-                        {
-                          from: '#89f7fe',
-                          to: '#66a6ff',
-                          name: '海洋蓝',
-                        },
-                        {
                           from: '#96fbc4',
                           to: '#f9f586',
                           name: '森林绿',
+                        },
+
+                        {
+                          from: '#FFD1FF',
+                          to: '#FAD0C4',
+                          name: '蜜桃粉', // 柔和的粉色渐变
+                        },
+                        {
+                          from: '#A8EDEA',
+                          to: '#FED6E3',
+                          name: '薄荷粉', // 清新的薄荷绿到粉色
+                        },
+                        {
+                          from: '#B2EBF2',
+                          to: '#80DEEA',
+                          name: '浅碧蓝', // 清透的浅蓝色
+                        },
+                        {
+                          from: '#DCEDC8',
+                          to: '#F1F8E9',
+                          name: '抹茶拿铁', // 淡淡的抹茶绿
                         },
                       ].map(({ from, to, name }) => (
                         <button
@@ -650,8 +630,7 @@ const XhsEditor = () => {
                           style={{
                             background: `linear-gradient(135deg, ${from}, ${to})`,
                           }}
-                          onClick={() => handleStyleChange('backgroundColor', { from, to })}
-                          title={name}></button>
+                          onClick={() => handleStyleChange('backgroundColor', { from, to })}></button>
                       ))}
                     </div>
                   </div>
@@ -709,7 +688,8 @@ const XhsEditor = () => {
 
                   {/* 卡片内容 - 调整高度和布局 */}
                   <div className="flex justify-center items-start">
-                    <div className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
+                    <div
+                      className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
                                   bg-gradient-to-b from-gray-50/50 to-white/50">
                       <MarkdownCard
                         ref={cardRef}
