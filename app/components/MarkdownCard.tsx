@@ -35,12 +35,13 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
       const contentHeight = contentRef.current.scrollHeight;
       const containerHeight = card.clientHeight;
       const currentScroll = card.scrollTop;
+      const maxScroll = card.scrollHeight - containerHeight;
       const isNearBottom = (containerHeight + currentScroll + 100) >= contentHeight;
 
       if (content.length > lastContentLengthRef.current && isNearBottom) {
         requestAnimationFrame(() => {
           card.scrollTo({
-            top: contentHeight - containerHeight,
+            top: maxScroll,
             behavior: 'smooth'
           });
         });
