@@ -3,16 +3,16 @@ import type { Metadata } from 'next';
 import { AnalyticsWrapper } from './components/analytics';
 
 export const metadata: Metadata = {
-  title: '小红书图文生成器 - AI文案助手 | 一键生成精美卡片，快速涨粉',
-  description: '使用小红书图文生成器，快速生成吸引人的内容卡片。支持AI文案创作、精美排版、一键导出，助您轻松涨粉。',
+  title: '文灵AI - 创新AI驱动写作助手 | 一键生成精美卡片',
+  description: '使用文灵AI，快速生成吸引人的内容卡片。支持AI文案创作、精美排版、一键导出。',
   keywords:
-    '小红书图文生成器,小红书文案助手,小红书排版工具,小红书卡片制作,图文排版,AI文案,小红书笔记,爆款文案,小红书ai,ai笔记',
-  authors: [{ name: '小红书图文助手' }],
+    '文灵AI,小红书文案助手,小红书排版工具,小红书卡片制作,图文排版,AI文案,小红书笔记,爆款文案,小红书ai,ai笔记',
+  authors: [{ name: '文灵AI助手' }],
   openGraph: {
-    title: '小红书图文生成器 - AI文案助手 | 一键生成精美卡片，快速涨粉',
-    description: '使用小红书图文生成器，快速生成吸引人的内容卡片。支持AI文案创作、精美排版、一键导出，助您轻松涨粉。',
+    title: '文灵AI - 创新AI驱动写作助手 | 一键生成精美卡片',
+    description: '使用文灵AI，快速生成吸引人的内容卡片。支持AI文案创作、精美排版、一键导出。',
     url: 'https://www.xhscard.top/',
-    siteName: '小红书图文生成器',
+    siteName: '文灵AI',
     images: [
       {
         url: 'https://www.xhscard.top/og-image.jpg', // 需要添加一张预览图
@@ -55,8 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebApplication',
-              name: '小红书图文生成器',
-              description: '专业的小红书图文生成工具,支持AI文案创作、精美排版、一键导出。',
+              name: '文灵AI',
+              description: '创新的AI驱动写作助手，专为小红书创作者设计，支持AI文案创作、精美排版、一键导出。',
               applicationCategory: 'UtilitiesApplication',
               operatingSystem: 'Web',
               offers: {
