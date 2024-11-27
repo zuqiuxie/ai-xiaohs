@@ -14,7 +14,7 @@ export default function Home() {
       </div>
 
       {/* 用户案例 */}
-      <div className="max-w-6xl mx-auto mt-20">
+      <div className="relative py-16 bg-white/40" id="user-examples">
         <h2 className="text-3xl font-bold text-center mb-4">用户案例展示</h2>
         <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">来看看其他用户是如何玩转我们的平台</p>
         <UserExamples />

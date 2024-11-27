@@ -51,12 +51,19 @@ export default function Header() {
               className="w-6 h-6"
             />
             <span className="text-lg font-medium bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              小红书助手
+              妙写
             </span>
           </div>
 
           {/* 右侧导航区域 */}
           <nav className="flex items-center gap-3 sm:gap-8">
+            {/* 用户案例 */}
+            <button
+              onClick={() => scrollToSection('user-examples')}
+              className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
+              案例
+            </button>
+            {/* 功能 */}
             <button
               onClick={() => scrollToSection('features')}
               className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
