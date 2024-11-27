@@ -1,5 +1,5 @@
 import ReactMarkdown from 'react-markdown';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useState, useRef, useEffect } from 'react';
 
 interface ComponentProps {
   children?: React.ReactNode;
@@ -20,22 +20,42 @@ interface MarkdownCardProps {
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
   ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange, onDownload }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const lastContentLengthRef = useRef<number>(0);
     const contentSize = fontSize;
     const h1Size = `${parseInt(fontSize) + 4}px`;
     const h2Size = `${parseInt(fontSize) + 2}px`;
     const h3Size = `${parseInt(fontSize) + 1}px`;
 
+    useEffect(() => {
+      if (!content || !cardRef.current || !contentRef.current) return;
 
+      const card = cardRef.current;
+      const contentHeight = contentRef.current.scrollHeight;
+      const containerHeight = card.clientHeight;
+      const currentScroll = card.scrollTop;
+      const isNearBottom = (containerHeight + currentScroll + 100) >= contentHeight;
 
+      if (content.length > lastContentLengthRef.current && isNearBottom) {
+        requestAnimationFrame(() => {
+          card.scrollTo({
+            top: contentHeight - containerHeight,
+            behavior: 'smooth'
+          });
+        });
+      }
+
+      lastContentLengthRef.current = content.length;
+    }, [content]);
 
     return (
       <div
-        ref={ref}
+        ref={cardRef}
         data-card
         className="w-full sm:w-[360px] min-h-[512px] max-h-[512px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none relative group"
         style={{
           background: `linear-gradient(135deg, ${backgroundColor.from} 0%, ${backgroundColor.to} 100%)`
-          // 使用 135deg 对角线渐变，从左上到右下
         }}>
         <button
           onClick={() => setIsEditing(!isEditing)}
@@ -58,7 +78,10 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
         </button>
 
         <div className="p-6">
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm" style={{ fontFamily: font }}>
+          <div
+            ref={contentRef}
+            className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm"
+            style={{ fontFamily: font }}>
             {!content && !isEditing ? (
               <div className="h-[432px] flex flex-col items-center justify-center text-gray-600 space-y-6">
                 <svg className="w-20 h-20 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

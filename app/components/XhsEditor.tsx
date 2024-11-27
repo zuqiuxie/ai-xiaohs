@@ -709,8 +709,7 @@ const XhsEditor = () => {
 
                   {/* 卡片内容 - 调整高度和布局 */}
                   <div className="flex justify-center items-start">
-                    <div
-                      className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
+                    <div className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
                                   bg-gradient-to-b from-gray-50/50 to-white/50">
                       <MarkdownCard
                         ref={cardRef}
