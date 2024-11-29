@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 export default function Home() {
   return (
     <>
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
         <Header />
 
         {/* 编辑器区域 */}
