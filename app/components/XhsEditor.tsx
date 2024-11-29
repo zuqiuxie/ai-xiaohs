@@ -127,11 +127,20 @@ const XhsEditor = () => {
       tempContainer.style.top = '-9999px';
       document.body.appendChild(tempContainer);
 
-      // 2. 克隆预览元素
-      const clone = previewElement.cloneNode(true) as HTMLElement;
+      // 2. 克隆卡片元素
+      const original = document.querySelector('[data-card]');
+      if (!original) return;
+
+      const clone = original.cloneNode(true) as HTMLElement;
+      
+      // 移除所有不需要导出的元素
+      const excludeElements = clone.querySelectorAll('[data-exclude-export]');
+      excludeElements.forEach(el => el.remove());
+
+      // 3. 创建临时容器
       tempContainer.appendChild(clone);
 
-      // 3. 设置基础样式
+      // 4. 设置基础样式
       clone.style.width = `${width}px`;
       clone.style.height = 'auto';
       clone.style.overflow = 'visible';
@@ -140,7 +149,7 @@ const XhsEditor = () => {
       clone.style.position = 'static';
       clone.style.background = `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`;
 
-      // 4. 处理内容样式
+      // 5. 处理内容样式
       const contentCards = clone.querySelectorAll('.bg-white\\/60');
       contentCards.forEach(card => {
         if (card instanceof HTMLElement) {
@@ -151,7 +160,7 @@ const XhsEditor = () => {
         }
       });
 
-      // 5. 处理文本样式
+      // 6. 处理文本样式
       const textElements = clone.querySelectorAll('h1, h2, h3, p, li');
       textElements.forEach(element => {
         if (element instanceof HTMLElement) {
