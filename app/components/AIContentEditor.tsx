@@ -14,7 +14,7 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
 
   const generateContent = async () => {
     const startTime = Date.now();
-    console.log('[Client] Generation started:', new Date().toISOString());
+    // console.log('[Client] Generation started:', new Date().toISOString());
 
     // 输入验证
     if (!title.trim()) {
@@ -29,7 +29,7 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
     setError(null);
     let accumulatedContent = '';
 
-    console.log('Starting content generation...');
+    // console.log('Starting content generation...');
 
     try {
       const response = await fetch('/api/generate/ai-card', {
@@ -47,8 +47,8 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // console.log('Response status:', response.status);
+      // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -70,12 +70,12 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         const { done, value } = await reader.read();
 
         if (done) {
-          const totalTime = Date.now() - startTime;
-          console.log('[Client] Stream complete:', {
-            totalTime: `${totalTime}ms`,
-            chunkCount,
-            timestamp: new Date().toISOString()
-          });
+          // const totalTime = Date.now() - startTime;
+          // console.log('[Client] Stream complete:', {
+          //   totalTime: `${totalTime}ms`,
+          //   chunkCount,
+          //   timestamp: new Date().toISOString()
+          // });
           break;
         }
 
@@ -84,24 +84,25 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
         const timeSinceLastChunk = currentTime - lastChunkTime;
 
         // 监控块之间的延迟
-        if (timeSinceLastChunk > 5000) { // 5秒阈值
+        if (timeSinceLastChunk > 5000) {
+          // 5秒阈值
           console.warn('[Client] Long delay between chunks:', {
             delay: `${timeSinceLastChunk}ms`,
             chunkNumber: chunkCount,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
 
         lastChunkTime = currentTime;
-        console.log('[Client] Chunk received:', {
-          chunkNumber: chunkCount,
-          chunkSize: value.length,
-          timeSinceStart: `${currentTime - startTime}ms`,
-          timestamp: new Date().toISOString()
-        });
+        // console.log('[Client] Chunk received:', {
+        //   chunkNumber: chunkCount,
+        //   chunkSize: value.length,
+        //   timeSinceStart: `${currentTime - startTime}ms`,
+        //   timestamp: new Date().toISOString()
+        // });
 
         const chunk = decoder.decode(value);
-        console.log('Raw chunk received:', chunk);
+        // console.log('Raw chunk received:', chunk);
 
         const lines = chunk.split('\n');
 
@@ -109,16 +110,16 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(5));
-              console.log('Parsed data:', data);
+              // console.log('Parsed data:', data);
 
               if (data.content && typeof data.content === 'string') {
                 accumulatedContent += data.content;
-                console.log('Accumulated content:', accumulatedContent);
+                // console.log('Accumulated content:', accumulatedContent);
                 onContentGenerated(accumulatedContent);
               }
 
               if (data.done) {
-                console.log('Stream marked as done');
+                // console.log('Stream marked as done');
               }
             } catch (e) {
               console.error('Error parsing chunk:', e, 'Line:', line);

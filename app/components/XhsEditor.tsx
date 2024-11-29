@@ -132,7 +132,7 @@ const XhsEditor = () => {
       if (!original) return;
 
       const clone = original.cloneNode(true) as HTMLElement;
-      
+
       // 移除所有不需要导出的元素
       const excludeElements = clone.querySelectorAll('[data-exclude-export]');
       excludeElements.forEach(el => el.remove());
@@ -444,7 +444,7 @@ const XhsEditor = () => {
 
   // 确保正确传递 onContentGenerated
   const handleContentGenerated = (content: string) => {
-    console.log('Content received in XhsEditor:', content);
+    // console.log('Content received in XhsEditor:', content);
     // 更新状态
     const newSections = [
       {
@@ -453,10 +453,10 @@ const XhsEditor = () => {
         content: content,
       },
     ];
-    console.log('Updating sections with:', newSections);
+    // console.log('Updating sections with:', newSections);
     setEditorState(prev => {
       const newState = { ...prev, sections: newSections };
-      console.log('New editor state:', newState);
+      // console.log('New editor state:', newState);
       return newState;
     });
   };
