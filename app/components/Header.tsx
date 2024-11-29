@@ -67,10 +67,16 @@ export default function Header() {
               className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
               说明
             </button>
-            <button
+            {/* <button
               onClick={() => scrollToSection('faq')}
               className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
               问答
+            </button> */}
+
+            <button
+              onClick={() => scrollToSection('pricing')}
+              className="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition-colors">
+              价格
             </button>
 
             {/* 新增联系我们入口 */}
