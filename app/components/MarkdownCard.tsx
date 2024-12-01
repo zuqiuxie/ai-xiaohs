@@ -105,10 +105,10 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
           style={{
             background: `linear-gradient(135deg, ${backgroundColor.from} 0%, ${backgroundColor.to} 100%)`,
           }}>
-          <div className="p-6">
+          <div className="p-5">
             <div
               ref={contentRef}
-              className="bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-sm"
+              className="bg-white/60 backdrop-blur-sm rounded-lg p-3 shadow-sm"
               style={{ fontFamily: font }}>
               {!content && !isEditing ? (
                 <div className="h-[432px] flex flex-col items-center justify-center text-gray-600 space-y-6">
