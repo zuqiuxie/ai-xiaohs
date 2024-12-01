@@ -28,6 +28,15 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
     const h2Size = `${parseInt(fontSize) + 2}px`;
     const h3Size = `${parseInt(fontSize) + 1}px`;
 
+    // Format content to ensure first line is a heading
+    const formatContent = (text: string) => {
+      const lines = text.split('\n');
+      if (lines.length > 0 && !lines[0].startsWith('###')) {
+        lines[0] = `### ${lines[0]}`;
+      }
+      return lines.join('\n');
+    };
+
     useEffect(() => {
       if (ref && typeof ref === 'function') {
         ref(cardRef.current);
@@ -44,13 +53,13 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
       const containerHeight = card.clientHeight;
       const currentScroll = card.scrollTop;
       const maxScroll = card.scrollHeight - containerHeight;
-      const isNearBottom = (containerHeight + currentScroll + 100) >= contentHeight;
+      const isNearBottom = containerHeight + currentScroll + 100 >= contentHeight;
 
       if (content.length > lastContentLengthRef.current && isNearBottom) {
         requestAnimationFrame(() => {
           card.scrollTo({
             top: maxScroll,
-            behavior: 'smooth'
+            behavior: 'smooth',
           });
         });
       }
@@ -63,8 +72,8 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
         <button
           data-exclude-export
           onClick={() => setIsEditing(!isEditing)}
-          className="absolute top-1 right-1 flex items-center gap-1 px-2.5 py-1 bg-white/95 backdrop-blur-sm 
-          rounded-full shadow-sm border border-gray-200 hover:bg-blue-50 hover:border-blue-200 
+          className="absolute top-1 right-1 flex items-center gap-1 px-2.5 py-1 bg-white/95 backdrop-blur-sm
+          rounded-full shadow-sm border border-gray-200 hover:bg-blue-50 hover:border-blue-200
           transition-all duration-200 z-10"
           title={isEditing ? '完成编辑' : '编辑内容'}>
           {isEditing ? (
@@ -94,7 +103,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
           data-card
           className="w-full sm:w-[360px] min-h-[512px] max-h-[512px] overflow-y-auto rounded-xl shadow-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 print:overflow-visible print:max-h-none"
           style={{
-            background: `linear-gradient(135deg, ${backgroundColor.from} 0%, ${backgroundColor.to} 100%)`
+            background: `linear-gradient(135deg, ${backgroundColor.from} 0%, ${backgroundColor.to} 100%)`,
           }}>
           <div className="p-6">
             <div
@@ -103,7 +112,11 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
               style={{ fontFamily: font }}>
               {!content && !isEditing ? (
                 <div className="h-[432px] flex flex-col items-center justify-center text-gray-600 space-y-6">
-                  <svg className="w-20 h-20 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    className="w-20 h-20 text-gray-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M9.5 3H5.5C4.11929 3 3 4.11929 3 5.5V9.5C3 10.8807 4.11929 12 5.5 12H9.5C10.8807 12 12 10.8807 12 9.5V5.5C12 4.11929 10.8807 3 9.5 3Z"
                       stroke="currentColor"
@@ -132,12 +145,8 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                   <div className="text-center space-y-3">
                     <p className="text-xl font-semibold text-gray-800">等待生成内容</p>
                     <div className="bg-blue-50 rounded-lg p-4 shadow-sm max-w-xs mx-auto">
-                      <p className="text-sm text-blue-700 mb-2">
-                        👈 请在左侧输入配置信息
-                      </p>
-                      <p className="text-sm text-blue-700 font-medium">
-                        然后点击按钮生成内容
-                      </p>
+                      <p className="text-sm text-blue-700 mb-2">👈 请在左侧输入配置信息</p>
+                      <p className="text-sm text-blue-700 font-medium">然后点击按钮生成内容</p>
                     </div>
                   </div>
                 </div>
@@ -262,7 +271,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                           </em>
                         ),
                       }}>
-                      {content}
+                      {formatContent(content)}
                     </ReactMarkdown>
                   )}
                 </div>
