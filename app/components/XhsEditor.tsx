@@ -11,10 +11,13 @@ import HotPostEditor from './HotPostEditor';
 import { showToast } from '@/app/utils/toast';
 import ErrorBoundary from './ErrorBoundary';
 
+import ImageTextEditor from './ImageTextEditor';
+
 const defaultSection: Section = {
   id: uuidv4(),
   title: '',
   content: '',
+  imageUrl: '',
 };
 
 export type CardType = 'column' | 'text' | 'ai';
@@ -461,6 +464,137 @@ const XhsEditor = () => {
     });
   };
 
+  // 添加图文编辑专用的下载函数
+  const handleImageDownload = async (format: 'png' | 'jpg' | 'jpeg') => {
+    if (!cardRef.current) return;
+
+    try {
+      const previewElement = cardRef.current;
+      const { width } = previewElement.getBoundingClientRect();
+
+      // 创建临时容器
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      document.body.appendChild(tempContainer);
+
+      // 克隆预览元素
+      const clone = previewElement.cloneNode(true) as HTMLElement;
+      tempContainer.appendChild(clone);
+
+      // 设置导出尺寸和样式
+      clone.style.width = `${width}px`;
+      clone.style.height = '512px';
+      clone.style.background = `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`;
+
+      // 等待样式应用
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 生成图片
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
+        logging: false,
+        width,
+        height: 512,
+        useCORS: true,
+        allowTaint: true,
+      });
+
+      // 获取图片数据
+      const imageData = canvas.toDataURL(`image/${format}`, 1.0);
+
+      if (isMobile()) {
+        try {
+          // 移动端分享或下载逻辑
+          const blob = await (await fetch(imageData)).blob();
+          const file = new File([blob], `小红书图片_${Date.now()}.${format}`, { type: `image/${format}` });
+
+          if (navigator.share && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: '保存图片',
+            });
+          } else {
+            // 移动端备用下载方案
+            const a = document.createElement('a');
+            a.href = imageData;
+            a.download = `小红书图片_${Date.now()}.${format}`;
+            a.style.cssText = `
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              z-index: 9999;
+              background: rgba(0,0,0,0.8);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: column;
+            `;
+
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.style.cssText = `
+              max-width: 90%;
+              max-height: 70vh;
+              object-fit: contain;
+              border-radius: 12px;
+            `;
+            a.appendChild(img);
+
+            const text = document.createElement('p');
+            text.textContent = '长按图片保存到相册';
+            text.style.cssText = `
+              color: white;
+              margin-top: 20px;
+              font-size: 16px;
+            `;
+            a.appendChild(text);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '关闭';
+            closeBtn.style.cssText = `
+              position: absolute;
+              top: 20px;
+              right: 20px;
+              padding: 8px 16px;
+              background: rgba(255,255,255,0.2);
+              border: none;
+              border-radius: 20px;
+              color: white;
+              font-size: 14px;
+            `;
+            closeBtn.onclick = e => {
+              e.preventDefault();
+              document.body.removeChild(a);
+            };
+            a.appendChild(closeBtn);
+
+            document.body.appendChild(a);
+          }
+        } catch (error) {
+          console.error('Mobile save failed:', error);
+          showToast('保存失败，请重试', 'error');
+        }
+      } else {
+        // 桌面端直接下载
+        const link = document.createElement('a');
+        link.download = `小红书图片_${Date.now()}.${format}`;
+        link.href = imageData;
+        link.click();
+        showToast('下载成功');
+      }
+
+      // 清理临时元素
+      document.body.removeChild(tempContainer);
+    } catch (error) {
+      console.error('下载失败:', error);
+      showToast('下载失败，请重试', 'error');
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen">
@@ -525,6 +659,15 @@ const XhsEditor = () => {
                       }`}
                       onClick={() => handleTemplateChange('hot_post')}>
                       爆款仿写
+                    </button>
+                    <button
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                        editorState.template === 'image_text'
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                      onClick={() => handleTemplateChange('image_text')}>
+                      图文编辑
                     </button>
                   </div>
                 </div>
@@ -658,9 +801,10 @@ const XhsEditor = () => {
                            text-lg mb-4"
                 />
 
-                {editorState.template === 'ai' ? (
+                {editorState.template === 'ai' && (
                   <AIContentEditor title={editorState.title} onContentGenerated={handleContentGenerated} />
-                ) : (
+                )}
+                {editorState.template === 'hot_post' && (
                   <HotPostEditor
                     onContentGenerated={content => {
                       const newSections = [
@@ -671,6 +815,20 @@ const XhsEditor = () => {
                         },
                       ];
                       setEditorState(prev => ({ ...prev, sections: newSections }));
+                    }}
+                  />
+                )}
+                {editorState.template === 'image_text' && (
+                  <ImageTextEditor
+                    onImageGenerated={(imageUrl) => {
+                      setEditorState(prev => ({
+                        ...prev,
+                        sections: [{
+                          ...prev.sections[0],
+                          id: prev.sections[0]?.id || uuidv4(),
+                          imageUrl
+                        }]
+                      }));
                     }}
                   />
                 )}
@@ -700,64 +858,109 @@ const XhsEditor = () => {
                     <div
                       className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
                                   bg-gradient-to-b from-gray-50/50 to-white/50">
-                      <MarkdownCard
-                        ref={cardRef}
-                        title={editorState.title}
-                        content={editorState.sections[0]?.content || ''}
-                        font={getFontStyle(editorState.font).fontFamily}
-                        fontSize={editorState.fontSize}
-                        backgroundColor={editorState.backgroundColor}
-                        onContentChange={handleCardContentChange}
-                        onTitleChange={handleCardTitleChange}
-                      />
+                      {editorState.template === 'image_text' ? (
+                        // 图文编辑预览 - 简化背景层级
+                        <div
+                          ref={cardRef}
+                          data-card
+                          className="relative w-full h-[512px] rounded-lg overflow-hidden"
+                          style={{
+                            backgroundImage: `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`,
+                          }}>
+                          {/* 图片容器 - 移除多余的背景层 */}
+                          {editorState.sections[0]?.imageUrl ? (
+                            <div className="h-full p-4">
+                              <div className="h-full w-full relative rounded-lg overflow-hidden">
+                                <img
+                                  src={editorState.sections[0].imageUrl}
+                                  alt="Preview content"
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            // 无图片时显示提示
+                            <div className="h-full flex items-center justify-center p-4">
+                              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 shadow-sm">
+                                <p className="text-gray-500 text-sm">等待生成图片...</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        // 原有的 MarkdownCard 预览
+                        <MarkdownCard
+                          ref={cardRef}
+                          title={editorState.title}
+                          content={editorState.sections[0]?.content || ''}
+                          font={getFontStyle(editorState.font).fontFamily}
+                          fontSize={editorState.fontSize}
+                          backgroundColor={editorState.backgroundColor}
+                          onContentChange={handleCardContentChange}
+                          onTitleChange={handleCardTitleChange}
+                        />
+                      )}
                     </div>
                   </div>
 
                   {/* 操作按钮组 */}
                   <div className="pt-4 px-2 sm:px-4 flex gap-2 sm:gap-3">
-                    {/* 复制文本按钮 */}
-                    <button
-                      onClick={async () => {
-                        const content = editorState.sections[0]?.content || '';
-                        if (!content.trim()) {
-                          showToast('暂无内容可复制', 'error');
-                          return;
-                        }
+                    {/* 复制文本按钮 - 仅在非图文编辑模式显示 */}
+                    {editorState.template !== 'image_text' && (
+                      <button
+                        onClick={async () => {
+                          const content = editorState.sections[0]?.content || '';
+                          if (!content.trim()) {
+                            showToast('暂无内容可复制', 'error');
+                            return;
+                          }
 
-                        try {
-                          const plainText = convertMarkdownToPlainText(content);
-                          await navigator.clipboard.writeText(plainText);
-                          showToast('已复制到剪贴板');
-                        } catch (err) {
-                          console.error('Failed to copy:', err);
-                          showToast('复制失败，请重试', 'error');
-                        }
-                      }}
-                      className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100
-                               rounded-lg transition-all duration-200
-                               text-sm font-medium text-gray-700
-                               flex items-center justify-center gap-2">
-                      <svg
-                        className="w-4 h-4 text-gray-600"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                      <span>复制文本</span>
-                    </button>
+                          try {
+                            const plainText = convertMarkdownToPlainText(content);
+                            await navigator.clipboard.writeText(plainText);
+                            showToast('已复制到剪贴板');
+                          } catch (err) {
+                            console.error('Failed to copy:', err);
+                            showToast('复制失败，请重试', 'error');
+                          }
+                        }}
+                        className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100
+                                 rounded-lg transition-all duration-200
+                                 text-sm font-medium text-gray-700
+                                 flex items-center justify-center gap-2">
+                        <svg
+                          className="w-4 h-4 text-gray-600"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>复制文本</span>
+                      </button>
+                    )}
 
-                    {/* 下载图片按钮 */}
+                    {/* 下载按钮 - 区分不同模板的下载逻辑 */}
                     <button
                       onClick={() => {
-                        const content = editorState.sections[0]?.content || '';
-                        if (!content.trim()) {
-                          showToast('暂无内容可下载', 'error');
-                          return;
+                        if (editorState.template === 'image_text') {
+                          // 图文编辑模式
+                          if (!editorState.sections[0]?.imageUrl) {
+                            showToast('暂无图片可下载', 'error');
+                            return;
+                          }
+                          handleImageDownload('png');
+                        } else {
+                          // 其他模式
+                          const content = editorState.sections[0]?.content || '';
+                          if (!content.trim()) {
+                            showToast('暂无内容可下载', 'error');
+                            return;
+                          }
+                          handleDownload('png');
                         }
-                        handleDownload('png');
                       }}
                       className="flex-1 px-4 py-2.5
                                bg-gradient-to-r from-blue-500 to-purple-500
