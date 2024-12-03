@@ -464,9 +464,12 @@ const XhsEditor = () => {
     });
   };
 
-  // 添加文字配图专用的下载函数
+  // 图文编辑专用的下载函数
   const handleImageDownload = async (format: 'png' | 'jpg' | 'jpeg') => {
-    if (!cardRef.current) return;
+    if (!cardRef.current) {
+      showToast('预览区域未准备好，请重试', 'error');
+      return;
+    }
 
     try {
       const previewElement = cardRef.current;
@@ -478,120 +481,135 @@ const XhsEditor = () => {
       tempContainer.style.left = '-9999px';
       document.body.appendChild(tempContainer);
 
-      // 克隆预览元素
-      const clone = previewElement.cloneNode(true) as HTMLElement;
-      tempContainer.appendChild(clone);
+      try {
+        // 克隆预览元素
+        const clone = previewElement.cloneNode(true) as HTMLElement;
+        tempContainer.appendChild(clone);
 
-      // 设置导出尺寸和样式
-      clone.style.width = `${width}px`;
-      clone.style.height = '512px';
-      clone.style.background = `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`;
+        // 设置导出尺寸和样式
+        clone.style.width = `${width}px`;
+        clone.style.height = '512px';
+        clone.style.background = `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`;
 
-      // 等待样式应用
-      await new Promise(resolve => setTimeout(resolve, 100));
+        // 等待样式应用
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-      // 生成图片
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
-        logging: false,
-        width,
-        height: 512,
-        useCORS: true,
-        allowTaint: true,
-      });
+        // 生成图片
+        const canvas = await html2canvas(clone, {
+          scale: 2,
+          backgroundColor: format === 'jpg' || format === 'jpeg' ? '#FFFFFF' : null,
+          logging: true, // 开启日志以便调试
+          width,
+          height: 512,
+          useCORS: true,
+          allowTaint: true,
+        });
 
-      // 获取图片数据
-      const imageData = canvas.toDataURL(`image/${format}`, 1.0);
-
-      if (isMobile()) {
-        try {
-          // 移动端分享或下载逻辑
-          const blob = await (await fetch(imageData)).blob();
-          const file = new File([blob], `小红书图片_${Date.now()}.${format}`, { type: `image/${format}` });
-
-          if (navigator.share && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: '保存图片',
-            });
-          } else {
-            // 移动端备用下载方案
-            const a = document.createElement('a');
-            a.href = imageData;
-            a.download = `小红书图片_${Date.now()}.${format}`;
-            a.style.cssText = `
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              z-index: 9999;
-              background: rgba(0,0,0,0.8);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              flex-direction: column;
-            `;
-
-            const img = document.createElement('img');
-            img.src = imageData;
-            img.style.cssText = `
-              max-width: 90%;
-              max-height: 70vh;
-              object-fit: contain;
-              border-radius: 12px;
-            `;
-            a.appendChild(img);
-
-            const text = document.createElement('p');
-            text.textContent = '长按图片保存到相册';
-            text.style.cssText = `
-              color: white;
-              margin-top: 20px;
-              font-size: 16px;
-            `;
-            a.appendChild(text);
-
-            const closeBtn = document.createElement('button');
-            closeBtn.textContent = '关闭';
-            closeBtn.style.cssText = `
-              position: absolute;
-              top: 20px;
-              right: 20px;
-              padding: 8px 16px;
-              background: rgba(255,255,255,0.2);
-              border: none;
-              border-radius: 20px;
-              color: white;
-              font-size: 14px;
-            `;
-            closeBtn.onclick = e => {
-              e.preventDefault();
-              document.body.removeChild(a);
-            };
-            a.appendChild(closeBtn);
-
-            document.body.appendChild(a);
-          }
-        } catch (error) {
-          console.error('Mobile save failed:', error);
-          showToast('保存失败，请重试', 'error');
+        if (!canvas) {
+          throw new Error('Failed to generate canvas');
         }
-      } else {
-        // 桌面端直接下载
-        const link = document.createElement('a');
-        link.download = `小红书图片_${Date.now()}.${format}`;
-        link.href = imageData;
-        link.click();
-        showToast('下载成功');
-      }
 
-      // 清理临时元素
-      document.body.removeChild(tempContainer);
+        // 获取图片数据
+        const imageData = canvas.toDataURL(`image/${format}`, 1.0);
+
+        if (isMobile()) {
+          try {
+            // 尝试使用 Web Share API
+            const blob = await (await fetch(imageData)).blob();
+            if (!blob) {
+              throw new Error('Failed to create blob from image data');
+            }
+
+            const file = new File([blob], `小红书图片_${Date.now()}.${format}`, { type: `image/${format}` });
+
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: '保存图片',
+              });
+              showToast('分享成功');
+            } else {
+              // 回退方案
+              const a = document.createElement('a');
+              a.href = imageData;
+              a.download = `小红书图片_${Date.now()}.${format}`;
+
+              // 设置样式和添加元素
+              Object.assign(a.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                zIndex: '9999',
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column',
+              });
+
+              const img = document.createElement('img');
+              Object.assign(img.style, {
+                maxWidth: '90%',
+                maxHeight: '70vh',
+                objectFit: 'contain',
+                borderRadius: '12px',
+              });
+              img.src = imageData;
+              a.appendChild(img);
+
+              const text = document.createElement('p');
+              Object.assign(text.style, {
+                color: 'white',
+                marginTop: '20px',
+                fontSize: '16px',
+              });
+              text.textContent = '长按图片保存到相册';
+              a.appendChild(text);
+
+              const closeBtn = document.createElement('button');
+              Object.assign(closeBtn.style, {
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                padding: '8px 16px',
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                borderRadius: '20px',
+                color: 'white',
+                fontSize: '14px',
+              });
+              closeBtn.textContent = '关闭';
+              closeBtn.onclick = e => {
+                e.preventDefault();
+                document.body.removeChild(a);
+              };
+              a.appendChild(closeBtn);
+
+              document.body.appendChild(a);
+            }
+          } catch (error) {
+            console.error('Mobile save failed:', error);
+            showToast('保存失败，请重试', 'error');
+          }
+        } else {
+          // 桌面端下载
+          const link = document.createElement('a');
+          link.download = `小红书图片_${Date.now()}.${format}`;
+          link.href = imageData;
+          link.click();
+          showToast('下载成功');
+        }
+      } finally {
+        // 确保清理临时容器
+        if (document.body.contains(tempContainer)) {
+          document.body.removeChild(tempContainer);
+        }
+      }
     } catch (error) {
-      console.error('下载失败:', error);
-      showToast('下载失败，请重试', 'error');
+      console.error('图片生成失败:', error);
+      showToast('图片生成失败，请重试', 'error');
     }
   };
 
@@ -859,7 +877,7 @@ const XhsEditor = () => {
                     </div>
                   </div>
 
-                  {/* 卡片内容 - 调整高度和布局 */}
+                  {/* 卡片内容 - 整高度和布局 */}
                   <div className="flex justify-center items-start">
                     <div
                       className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
