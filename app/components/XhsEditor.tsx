@@ -464,7 +464,7 @@ const XhsEditor = () => {
     });
   };
 
-  // 添加图文编辑专用的下载函数
+  // 添加文字配图专用的下载函数
   const handleImageDownload = async (format: 'png' | 'jpg' | 'jpeg') => {
     if (!cardRef.current) return;
 
@@ -667,7 +667,7 @@ const XhsEditor = () => {
                           : 'text-gray-600 hover:text-gray-900'
                       }`}
                       onClick={() => handleTemplateChange('image_text')}>
-                      图文编辑
+                      文字配图
                     </button>
                   </div>
                 </div>
@@ -677,41 +677,43 @@ const XhsEditor = () => {
               <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-3">
                 <div className="flex flex-col sm:grid sm:grid-cols-12 gap-3">
                   {/* 字体和字号选择器在移动端并排显示 */}
-                  <div className="flex gap-2 sm:contents">
-                    {/* 字体选择 - 移动端占据更多空间 */}
-                    <div className="flex-1 sm:col-span-4">
-                      <select
-                        value={editorState.font}
-                        onChange={e => handleStyleChange('font', e.target.value)}
-                        className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
+                  {['ai', 'hot_post'].includes(editorState.template) && (
+                    <div className="flex gap-2 sm:contents">
+                      {/* 字体选择 - 移动端占据更多空间 */}
+                      <div className="flex-1 sm:col-span-4">
+                        <select
+                          value={editorState.font}
+                          onChange={e => handleStyleChange('font', e.target.value)}
+                          className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
                                  focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                        {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
-                          <optgroup key={category} label={category}>
-                            {fonts.map(font => (
-                              <option key={font.label} value={font.value}>
-                                {font.label}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                      </select>
-                    </div>
+                          {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
+                            <optgroup key={category} label={category}>
+                              {fonts.map(font => (
+                                <option key={font.label} value={font.value}>
+                                  {font.label}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                        </select>
+                      </div>
 
-                    {/* 字号选择 - 移动端保持合适比例 */}
-                    <div className="w-24 sm:col-span-2">
-                      <select
-                        value={editorState.fontSize}
-                        onChange={e => handleStyleChange('fontSize', e.target.value)}
-                        className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
+                      {/* 字号选择 - 移动端保持合适比例 */}
+                      <div className="w-24 sm:col-span-2">
+                        <select
+                          value={editorState.fontSize}
+                          onChange={e => handleStyleChange('fontSize', e.target.value)}
+                          className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
                                  focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                        <option value="14px">14px</option>
-                        <option value="15px">15px</option>
-                        <option value="16px">16px</option>
-                        <option value="18px">18px</option>
-                        <option value="20px">20px</option>
-                      </select>
+                          <option value="14px">14px</option>
+                          <option value="15px">15px</option>
+                          <option value="16px">16px</option>
+                          <option value="18px">18px</option>
+                          <option value="20px">20px</option>
+                        </select>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* 背景色选择 - 移动端优化 */}
                   <div className="sm:col-span-6 mt-2 sm:mt-0">
@@ -791,15 +793,17 @@ const XhsEditor = () => {
 
               {/* 内容编辑区 */}
               <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-4">
-                <input
-                  type="text"
-                  value={editorState.title}
-                  onChange={e => handleTitleChange(e.target.value)}
-                  placeholder="输入标题"
-                  className="w-full px-4 py-2.5 bg-white rounded-lg border border-gray-200
+                {['ai', 'hot_post'].includes(editorState.template) && (
+                  <input
+                    type="text"
+                    value={editorState.title}
+                    onChange={e => handleTitleChange(e.target.value)}
+                    placeholder="输入标题"
+                    className="w-full px-4 py-2.5 bg-white rounded-lg border border-gray-200
                            focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all
                            text-lg mb-4"
-                />
+                  />
+                )}
 
                 {editorState.template === 'ai' && (
                   <AIContentEditor title={editorState.title} onContentGenerated={handleContentGenerated} />
@@ -820,14 +824,16 @@ const XhsEditor = () => {
                 )}
                 {editorState.template === 'image_text' && (
                   <ImageTextEditor
-                    onImageGenerated={(imageUrl) => {
+                    onImageGenerated={imageUrl => {
                       setEditorState(prev => ({
                         ...prev,
-                        sections: [{
-                          ...prev.sections[0],
-                          id: prev.sections[0]?.id || uuidv4(),
-                          imageUrl
-                        }]
+                        sections: [
+                          {
+                            ...prev.sections[0],
+                            id: prev.sections[0]?.id || uuidv4(),
+                            imageUrl,
+                          },
+                        ],
                       }));
                     }}
                   />
@@ -859,7 +865,7 @@ const XhsEditor = () => {
                       className="w-full max-w-[360px] sm:w-[360px] relative rounded-lg overflow-hidden
                                   bg-gradient-to-b from-gray-50/50 to-white/50">
                       {editorState.template === 'image_text' ? (
-                        // 图文编辑预览 - 简化背景层级
+                        // 文字配图预览
                         <div
                           ref={cardRef}
                           data-card
@@ -867,7 +873,7 @@ const XhsEditor = () => {
                           style={{
                             backgroundImage: `linear-gradient(135deg, ${editorState.backgroundColor.from}, ${editorState.backgroundColor.to})`,
                           }}>
-                          {/* 图片容器 - 移除多余的背景层 */}
+                          {/* 图片容器 */}
                           {editorState.sections[0]?.imageUrl ? (
                             <div className="h-full p-4">
                               <div className="h-full w-full relative rounded-lg overflow-hidden">
@@ -880,11 +886,14 @@ const XhsEditor = () => {
                               </div>
                             </div>
                           ) : (
-                            // 无图片时显示提示
-                            <div className="h-full flex items-center justify-center p-4">
-                              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 shadow-sm">
-                                <p className="text-gray-500 text-sm">等待生成图片...</p>
+                            // 无图片时的提示 - 统一样式
+                            <div className="h-full flex flex-col items-center justify-center p-4 text-center">
+                              <div className="w-16 h-16 mb-4 text-gray-300">
+                                <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z" />
+                                </svg>
                               </div>
+                              <p className="text-gray-500 text-sm">请输入关键词生成图片</p>
                             </div>
                           )}
                         </div>
@@ -906,7 +915,7 @@ const XhsEditor = () => {
 
                   {/* 操作按钮组 */}
                   <div className="pt-4 px-2 sm:px-4 flex gap-2 sm:gap-3">
-                    {/* 复制文本按钮 - 仅在非图文编辑模式显示 */}
+                    {/* 复制文本按钮 - 仅在非文字配图模式显示 */}
                     {editorState.template !== 'image_text' && (
                       <button
                         onClick={async () => {
@@ -946,7 +955,7 @@ const XhsEditor = () => {
                     <button
                       onClick={() => {
                         if (editorState.template === 'image_text') {
-                          // 图文编辑模式
+                          // 文字配图模式
                           if (!editorState.sections[0]?.imageUrl) {
                             showToast('暂无图片可下载', 'error');
                             return;
