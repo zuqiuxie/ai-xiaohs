@@ -3,8 +3,12 @@ import type { Metadata } from 'next';
 import { AnalyticsWrapper } from '../components/analytics';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
+import { unstable_setRequestLocale } from 'next-intl/server';
 import { locales } from '../config/i18n';
 import Script from 'next/script';
+
+// 1. 定义 Locale 类型
+type Locale = typeof locales[number];  // 这样会自动推导出 "zh" | "en" 类型
 
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
@@ -59,8 +63,15 @@ export default async function LocaleLayout({
   params: { locale },
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  // 2. 使用 Locale 类型
+  params: { locale: Locale };
 }) {
+  // 3. 现在 locale 的类型已经是 "zh" | "en"，不需要类型断言
+  if (!locales.includes(locale)) notFound();
+
+  // 4. 不需要类型断言了
+  unstable_setRequestLocale(locale);
+
   const messages = await getMessages(locale);
 
   return (

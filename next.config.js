@@ -1,10 +1,10 @@
-const withNextIntl = require('next-intl/plugin')('./app/i18n/request.ts');
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin('./app/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ['images.unsplash.com'],
-  },
+  output: 'standalone'
 };
 
 module.exports = withNextIntl(nextConfig);

@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "WenLing",
+    "title": "Rednote",
     "description": "Generate beautiful XHS cards with AI",
     "generate": "Generate",
     "loading": "Loading...",
@@ -41,10 +41,10 @@
     "contact": "Contact",
     "scanQRCode": "Scan QR Code for WeChat",
     "pricing": "Price",
-    "brandName": "WenLing AI",
+    "brandName": "Rednote AI",
     "brandDescription": "An AI-powered XHS content creation assistant, making content creation easier and more engaging.",
     "quickLinks": "Quick Links",
-    "copyright": "WenLing AI. All rights reserved."
+    "copyright": "Rednote AI. All rights reserved."
   },
   "editor": {
     "title1": "XHS Card Generator",

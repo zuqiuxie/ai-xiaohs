@@ -15,7 +15,6 @@ import ImageTextEditor from './ImageTextEditor';
 
 import { useTranslations } from 'next-intl';
 
-
 const defaultSection: Section = {
   id: uuidv4(),
   title: '',
@@ -789,7 +788,7 @@ const XhsEditor = () => {
                           from: '#DCEDC8',
                           to: '#F1F8E9',
                         },
-                      ].map(({ from, to, name }) => (
+                      ].map(({ from, to }) => (
                         <button
                           key={`${from}-${to}`}
                           className={`group relative w-8 h-8 sm:w-6 sm:h-6 rounded-full transition-all duration-200 ${
