@@ -1,10 +1,10 @@
+const withNextIntl = require('next-intl/plugin')('./app/i18n/request.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  experimental: {
-    appDir: true
-  }
-}
+  images: {
+    domains: ['images.unsplash.com'],
+  },
+};
 
-module.exports = nextConfig
+module.exports = withNextIntl(nextConfig);

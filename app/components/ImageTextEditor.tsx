@@ -46,7 +46,7 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
         <input
           type="text"
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={e => setKeyword(e.target.value)}
           placeholder="输入关键词生成图片"
           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
@@ -55,10 +55,9 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
       <button
         onClick={handleGenerateImage}
         disabled={isLoading}
-        className={`w-full px-4 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg 
+        className={`w-full px-4 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg
                    font-medium transition-all hover:from-blue-600 hover:to-blue-700
-                   disabled:opacity-50 disabled:cursor-not-allowed`}
-      >
+                   disabled:opacity-50 disabled:cursor-not-allowed`}>
         {isLoading ? '生成中...' : '生成图片'}
       </button>
     </div>
