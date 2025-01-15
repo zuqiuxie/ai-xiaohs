@@ -288,7 +288,7 @@ const XhsEditor = () => {
         try {
           // 尝试使用 Web Share API
           const blob = await (await fetch(imageData)).blob();
-          const file = new File([blob], `小红书卡片_${Date.now()}.${format}`, { type: `image/${format}` });
+          const file = new File([blob], `xiaohongshu_${Date.now()}.${format}`, { type: `image/${format}` });
 
           if (navigator.share && navigator.canShare({ files: [file] })) {
             await navigator.share({
@@ -299,7 +299,7 @@ const XhsEditor = () => {
             // 回退方案：创建临时 a 标签并触发点击
             const a = document.createElement('a');
             a.href = imageData;
-            a.download = `小红书卡片_${Date.now()}.${format}`;
+            a.download = `xiaohongshu_${Date.now()}.${format}`;
 
             // 添加样式使其覆盖整个屏幕
             a.style.position = 'fixed';
@@ -358,7 +358,7 @@ const XhsEditor = () => {
       } else {
         // 桌面端直接下载
         const link = document.createElement('a');
-        link.download = `小红书卡片_${Date.now()}.${format}`;
+        link.download = `xiaohongshu_${Date.now()}.${format}`;
         link.href = imageData;
         link.click();
         showToast('下载成功');
