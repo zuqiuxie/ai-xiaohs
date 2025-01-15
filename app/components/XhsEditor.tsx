@@ -540,7 +540,7 @@ const XhsEditor = () => {
               // 回退方案
               const a = document.createElement('a');
               a.href = imageData;
-              a.download = `小红书图片_${Date.now()}.${format}`;
+              a.download = `xiaohongshu_${Date.now()}.${format}`;
 
               // 设置样式和添加元素
               Object.assign(a.style, {
@@ -604,7 +604,7 @@ const XhsEditor = () => {
         } else {
           // 桌面端下载
           const link = document.createElement('a');
-          link.download = `小红书图片_${Date.now()}.${format}`;
+          link.download = `xiaohongshu_${Date.now()}.${format}`;
           link.href = imageData;
           link.click();
           showToast('下载成功');

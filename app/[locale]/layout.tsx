@@ -4,6 +4,7 @@ import { AnalyticsWrapper } from '../components/analytics';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { locales } from '../config/i18n';
+import Script from 'next/script';
 
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
@@ -70,7 +71,8 @@ export default async function LocaleLayout({
           href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&family=Zhi+Mang+Xing&family=Caveat&family=Dancing+Script&display=swap"
           rel="stylesheet"
         />
-        <script
+        <Script
+          id="schema-script"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -88,10 +90,12 @@ export default async function LocaleLayout({
             }),
           }}
         />
-        <script
+        <Script
           defer
           src="https://cloud.umami.is/script.js"
-          data-website-id="0e6a290d-64cf-4b47-b932-4f7262cc63bb"></script>
+          data-website-id="0e6a290d-64cf-4b47-b932-4f7262cc63bb"
+          strategy="afterInteractive"
+        />
       </head>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
