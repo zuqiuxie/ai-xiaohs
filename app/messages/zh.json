@@ -92,8 +92,28 @@
     "downloadCardTip": "暂无图片可下载",
     "downloadCardTip2": "暂无内容可下载",
     "inputContent": "请输入内容...",
-   
-
-
+    "pricingTitle": "简单灵活的定价",
+    "pricingSubtitle": "选择最适合您的方案，开启AI创作之旅",
+    "pricingBasic": "体验版",
+    "pricingPro": "专业版",
+    "pricingPeriod": "/月",
+    "pricingBasicDesc": "适合个人轻度使用",
+    "pricingProDesc": "适合内容创作者与品牌号",
+    "pricingBasicFeature1": "每月50次AI文案生成",
+    "pricingBasicFeature2": "基础排版功能",
+    "pricingBasicFeature3": "3种精选字体",
+    "pricingBasicFeature4": "5种背景颜色",
+    "pricingBasicFeature5": "标准导出功能",
+    "pricingProFeature1": "每月200次AI文案生成",
+    "pricingProFeature2": "专业排版功能",
+    "pricingProFeature3": "全部精选字体",
+    "pricingProFeature4": "全部背景颜色",
+    "pricingProFeature5": "爆款文案仿写",
+    "pricingProFeature6": "优先技术支持",
+    "pricingBasicButton": "开始体验",
+    "pricingProButton": "升级专业版",
+    "pricingPopular": "推荐方案",
+    "pricingQRCodeTitle": "微信扫码支付",
+    "pricingQRCodeDesc": "用户量激增，费用超预期，期待您的支持与赞赏！"
   }
 }

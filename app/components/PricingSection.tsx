@@ -4,40 +4,55 @@ import { CheckIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-const tiers = [
-  {
-    name: '体验版',
-    id: 'basic',
-    price: '¥9.9',
-    period: '/月',
-    description: '适合个人轻度使用',
-    features: ['每月50次AI文案生成', '基础排版功能', '3种精选字体', '5种背景颜色', '标准导出功能'],
-    buttonText: '开始体验',
-    buttonStyle: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-  },
-  {
-    name: '专业版',
-    id: 'pro',
-    price: '¥19.9',
-    period: '/月',
-    description: '适合内容创作者与品牌号',
-    features: ['每月200次AI文案生成', '专业排版功能', '全部精选字体', '全部背景颜色', '爆款文案仿写', '优先技术支持'],
-    buttonText: '升级专业版',
-    buttonStyle: 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600',
-    mostPopular: true,
-  },
-];
+
 
 export default function PricingSection() {
   const [showPayModal, setShowPayModal] = useState(false);
   const t = useTranslations('editor');
 
+  const tiers = [
+    {
+      name: t('pricingBasic'),
+      id: 'basic',
+      price: '¥9.9',
+      period: t('pricingPeriod'),
+      description: t('pricingBasicDesc'),
+      features: [
+        t('pricingBasicFeature1'),
+        t('pricingBasicFeature2'),
+        t('pricingBasicFeature3'),
+        t('pricingBasicFeature4'),
+        t('pricingBasicFeature5'),
+      ],
+      buttonText: t('pricingBasicButton'),
+      buttonStyle: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+    },
+    {
+      name: t('pricingPro'),
+      id: 'pro',
+      price: '¥19.9',
+      period: t('pricingPeriod'),
+      description: t('pricingProDesc'),
+      features: [
+        t('pricingProFeature1'),
+        t('pricingProFeature2'),
+        t('pricingProFeature3'),
+        t('pricingProFeature4'),
+        t('pricingProFeature5'),
+        t('pricingProFeature6'),
+      ],
+      buttonText: t('pricingProButton'),
+      buttonStyle: 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600',
+      mostPopular: true,
+    },
+  ];
+
   return (
     <div id="pricing" className="relative px-4 py-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-center mb-4">简单灵活的定价</h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">选择最适合您的方案，开启AI创作之旅</p>
+          <h2 className="text-3xl font-bold text-center mb-4">{t('pricingTitle')}</h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">{t('pricingSubtitle')}</p>
         </div>
         <div className="isolate mx-auto grid max-w-md grid-cols-1 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-x-8 xl:gap-x-12">
           {tiers.map(tier => (
@@ -48,7 +63,7 @@ export default function PricingSection() {
               }`}>
               {tier.mostPopular && (
                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-1 text-sm font-medium text-white">
-                  推荐方案
+                  {t('pricingPopular')}
                 </span>
               )}
               <h3 className="text-lg font-semibold leading-8 text-gray-900">{tier.name}</h3>
@@ -96,7 +111,7 @@ export default function PricingSection() {
             </button>
 
             {/* 标题 */}
-            <h3 className="text-xl font-semibold text-center mb-4">微信扫码支付</h3>
+            <h3 className="text-xl font-semibold text-center mb-4">{t('pricingQRCodeTitle')}</h3>
 
             {/* 赞赏码图片 */}
             <div className="relative w-64 h-64 mx-auto">
@@ -104,7 +119,7 @@ export default function PricingSection() {
             </div>
 
             {/* 提示文字 */}
-            <p className="text-gray-600 text-center mt-4 text-sm">用户量激增，费用超预期，期待您的支持与赞赏！</p>
+            <p className="text-gray-600 text-center mt-4 text-sm">{t('pricingQRCodeDesc')}</p>
           </div>
         </div>
       )}
