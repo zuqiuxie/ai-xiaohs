@@ -119,6 +119,20 @@
     "pricingPopular": "推荐方案",
     "pricingQRCodeTitle": "微信扫码支付",
     "pricingQRCodeDesc": "用户量激增，费用超预期，期待您的支持与赞赏！",
-    "backgroundColor": "背景色"
+    "backgroundColor": "背景色",
+    "fonts": {
+      "simpleChinese": "中文简约",
+      "handwriting": "手写风格",
+      "sourceHanSans": "思源黑体",
+      "sourceHanSerif": "思源宋体",
+      "alibaba": "阿里巴巴普惠体",
+      "lxgw": "霞鹜楷",
+      "kaiti": "楷体",
+      "mashanzheng": "手写体",
+      "liujianmao": "潇洒体",
+      "zhimangxing": "有爱体",
+      "caveat": "Caveat",
+      "dancingScript": "Dancing Script"
+    }
   }
 }

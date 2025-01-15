@@ -25,22 +25,22 @@ const defaultSection: Section = {
 
 export type CardType = 'column' | 'text' | 'ai';
 
-const FONT_OPTIONS = {
-  中文简约: [
-    { label: '思源黑体', value: '"Source Han Sans SC", "Noto Sans SC", sans-serif' },
-    { label: '思源宋体', value: '"Source Han Serif SC", "Noto Serif SC", serif' },
-    { label: '阿里巴巴普惠体', value: '"Alibaba PuHuiTi", sans-serif' },
-    { label: '霞鹜楷', value: '"LXGW WenKai", serif' },
-    { label: '楷体', value: 'KaiTi, STKaiti, serif' },
+const FONT_OPTIONS = (t: any) => ({
+  [t('fonts.simpleChinese')]: [
+    { labelKey: 'fonts.sourceHanSans', value: '"Source Han Sans SC", "Noto Sans SC", sans-serif' },
+    { labelKey: 'fonts.sourceHanSerif', value: '"Source Han Serif SC", "Noto Serif SC", serif' },
+    { labelKey: 'fonts.alibaba', value: '"Alibaba PuHuiTi", sans-serif' },
+    { labelKey: 'fonts.lxgw', value: '"LXGW WenKai", serif' },
+    { labelKey: 'fonts.kaiti', value: 'KaiTi, STKaiti, serif' },
   ],
-  手写风格: [
-    { label: '手写体', value: '"Ma Shan Zheng", cursive' },
-    { label: '潇洒体', value: '"Liu Jian Mao Cao", cursive' },
-    { label: '有爱体', value: '"Zhi Mang Xing", cursive' },
-    { label: 'Caveat', value: '"Caveat", cursive' },
-    { label: 'Dancing Script', value: '"Dancing Script", cursive' },
+  [t('fonts.handwriting')]: [
+    { labelKey: 'fonts.mashanzheng', value: '"Ma Shan Zheng", cursive' },
+    { labelKey: 'fonts.liujianmao', value: '"Liu Jian Mao Cao", cursive' },
+    { labelKey: 'fonts.zhimangxing', value: '"Zhi Mang Xing", cursive' },
+    { labelKey: 'fonts.caveat', value: '"Caveat", cursive' },
+    { labelKey: 'fonts.dancingScript', value: '"Dancing Script", cursive' },
   ],
-};
+});
 
 // 添加新的样式常量
 const GRADIENT_TEXT = `
@@ -50,6 +50,9 @@ const GRADIENT_TEXT = `
 
 const XhsEditor = () => {
   const t = useTranslations('editor');
+
+  // 将 FONT_OPTIONS 转换为实际的选项
+  const fontOptions = FONT_OPTIONS(t);
 
   const [editorState, setEditorState] = useState<EditorState>({
     template: 'ai',
@@ -709,11 +712,11 @@ const XhsEditor = () => {
                           onChange={e => handleStyleChange('font', e.target.value)}
                           className="w-full px-2.5 py-2 sm:py-1.5 rounded-lg border border-gray-200 bg-white text-sm
                                  focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-                          {Object.entries(FONT_OPTIONS).map(([category, fonts]) => (
+                          {Object.entries(fontOptions).map(([category, fonts]) => (
                             <optgroup key={category} label={category}>
                               {fonts.map(font => (
-                                <option key={font.label} value={font.value}>
-                                  {font.label}
+                                <option key={font.value} value={font.value}>
+                                  {t(font.labelKey)}
                                 </option>
                               ))}
                             </optgroup>

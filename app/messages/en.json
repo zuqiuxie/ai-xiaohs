@@ -119,6 +119,20 @@
     "pricingPopular": "Most Popular",
     "pricingQRCodeTitle": "WeChat Pay",
     "pricingQRCodeDesc": "Due to increasing users, we appreciate your support!",
-    "backgroundColor": "Background Color"
+    "backgroundColor": "Background Color",
+    "fonts": {
+      "simpleChinese": "Chinese Fonts",
+      "handwriting": "Handwriting",
+      "sourceHanSans": "Source Han Sans",
+      "sourceHanSerif": "Source Han Serif",
+      "alibaba": "Alibaba PuHuiTi",
+      "lxgw": "LXGW WenKai",
+      "kaiti": "Kai Ti",
+      "mashanzheng": "Ma Shan Zheng",
+      "liujianmao": "Liu Jian Mao",
+      "zhimangxing": "Zhi Mang Xing",
+      "caveat": "Caveat",
+      "dancingScript": "Dancing Script"
+    }
   }
 }
