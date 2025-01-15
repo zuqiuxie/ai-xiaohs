@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "小红书卡片生成器",
+    "title": "文灵",
     "description": "使用 AI 生成精美的小红书卡片",
     "generate": "生成",
     "loading": "加载中...",
@@ -8,9 +8,9 @@
     "download": "下载",
     "regenerate": "重新生成",
     "language": "语言",
-    "examples": "用户案例展示",
+    "examples": "案例",
     "examplesDescription": "来看看其他用户是如何使用文灵AI制作图文卡片的",
-    "features": "强大的创作功能",
+    "features": "功能",
     "featuresDescription": "基于先进的 AI 技术，为您提供智能、高效的创作体验",
     "feature1Title": "智能创作",
     "feature1Description": "基于 AI 模型，快速生成吸引人的文案",
@@ -20,7 +20,7 @@
     "feature3Description": "支持多种内容类型，满足不同创作需求",
     "feature4Title": "隐私保护",
     "feature4Description": "确保您的创作内容安全可靠",
-    "guide": "使用说明",
+    "guide": "说明",
     "guideDescription": "两种模式，满足不同创作需求",
     "inspirationMode": "灵感创作模式",
     "hotPostMode": "爆款仿写模式",
@@ -40,7 +40,11 @@
     "hotStep4Description": "调整文案风格和细节",
     "contact": "联系我",
     "scanQRCode": "扫码添加微信",
-    "pricing": "价格"
+    "pricing": "价格",
+    "brandName": "文灵AI",
+    "brandDescription": "基于AI技术的小红书图文创作助手，让创作更轻松，让文案更出彩。",
+    "quickLinks": "快速链接",
+    "copyright": "文灵AI. 保留所有权利."
   },
   "editor": {
     "title1": "小红书图文生成器",
@@ -114,6 +118,7 @@
     "pricingProButton": "升级专业版",
     "pricingPopular": "推荐方案",
     "pricingQRCodeTitle": "微信扫码支付",
-    "pricingQRCodeDesc": "用户量激增，费用超预期，期待您的支持与赞赏！"
+    "pricingQRCodeDesc": "用户量激增，费用超预期，期待您的支持与赞赏！",
+    "backgroundColor": "背景色"
   }
 }

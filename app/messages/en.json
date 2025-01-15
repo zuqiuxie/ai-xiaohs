@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "XHS Card Generator",
+    "title": "Rednote",
     "description": "Generate beautiful XHS cards with AI",
     "generate": "Generate",
     "loading": "Loading...",
@@ -8,9 +8,9 @@
     "download": "Download",
     "regenerate": "Regenerate",
     "language": "Language",
-    "examples": "User Examples",
+    "examples": "Examples",
     "examplesDescription": "See how other users create content cards with our AI",
-    "features": "Powerful Creation Features",
+    "features": "Features",
     "featuresDescription": "Providing intelligent and efficient creation experience based on advanced AI technology",
     "feature1Title": "Smart Creation",
     "feature1Description": "Quickly generate engaging content with AI models",
@@ -20,7 +20,7 @@
     "feature3Description": "Support various content types for different needs",
     "feature4Title": "Privacy Protection",
     "feature4Description": "Ensure your content is safe and secure",
-    "guide": "User Guide",
+    "guide": "Guide",
     "guideDescription": "Two modes to meet different creation needs",
     "inspirationMode": "Inspiration Mode",
     "hotPostMode": "Hot Post Mode",
@@ -40,7 +40,11 @@
     "hotStep4Description": "Adjust content style and details",
     "contact": "Contact",
     "scanQRCode": "Scan QR Code for WeChat",
-    "pricing": "Price"
+    "pricing": "Price",
+    "brandName": "WenLing AI",
+    "brandDescription": "An AI-powered XHS content creation assistant, making content creation easier and more engaging.",
+    "quickLinks": "Quick Links",
+    "copyright": "WenLing AI. All rights reserved."
   },
   "editor": {
     "title1": "XHS Card Generator",
@@ -114,6 +118,7 @@
     "pricingProButton": "Upgrade to Pro",
     "pricingPopular": "Most Popular",
     "pricingQRCodeTitle": "WeChat Pay",
-    "pricingQRCodeDesc": "Due to increasing users, we appreciate your support!"
+    "pricingQRCodeDesc": "Due to increasing users, we appreciate your support!",
+    "backgroundColor": "Background Color"
   }
 }

@@ -1,8 +1,10 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export default function Footer() {
+  const t = useTranslations('common');
   const currentYear = new Date().getFullYear();
 
   return (
@@ -15,39 +17,37 @@ export default function Footer() {
             <div className="flex items-center gap-2 mb-3">
               <Image src="/favicon.ico" alt="Logo" width={20} height={20} className="w-5 h-5" />
               <span className="text-base font-medium bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                文灵AI
+                {t('brandName')}
               </span>
             </div>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              基于AI技术的小红书图文创作助手，让创作更轻松，让文案更出彩。
-            </p>
+            <p className="text-gray-500 text-sm leading-relaxed">{t('brandDescription')}</p>
           </div>
 
           {/* 右侧导航区域 */}
           <div className="flex flex-wrap gap-12">
             {/* 快速链接 */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">快速链接</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">{t('quickLinks')}</h3>
               <ul className="space-y-2">
                 <li>
                   <button
                     onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                     className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
-                    功能介绍
+                    {t('features')}
                   </button>
                 </li>
                 <li>
                   <button
                     onClick={() => document.getElementById('guide')?.scrollIntoView({ behavior: 'smooth' })}
                     className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
-                    使用说明
+                    {t('guide')}
                   </button>
                 </li>
                 <li>
                   <button
                     onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                     className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
-                    价格方案
+                    {t('pricing')}
                   </button>
                 </li>
               </ul>
@@ -55,7 +55,7 @@ export default function Footer() {
 
             {/* 联系方式 */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">联系我们</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">{t('contact')}</h3>
               <ul className="space-y-2">
                 <li>
                   <a
@@ -81,7 +81,7 @@ export default function Footer() {
         {/* 版权信息 */}
         <div className="border-t border-gray-100 pt-6">
           <p className="text-sm text-center text-gray-400">
-            © {currentYear} 文灵AI. 保留所有权利.
+            © {currentYear} {t('copyright')}
           </p>
         </div>
       </div>

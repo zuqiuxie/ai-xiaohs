@@ -741,7 +741,7 @@ const XhsEditor = () => {
                   {/* 背景色选择 - 移动端优化 */}
                   <div className="sm:col-span-6 mt-2 sm:mt-0">
                     {/* 添加背景色标签 */}
-                    <div className="text-xs text-gray-500 mb-2 sm:hidden">背景色</div>
+                    <div className="text-xs text-gray-500 mb-2 sm:hidden">{t('backgroundColor')}</div>
                     {/* 改用网格布局展示颜色选项 */}
                     <div className="grid grid-cols-6 sm:flex sm:items-center gap-2 sm:gap-1">
                       {[
