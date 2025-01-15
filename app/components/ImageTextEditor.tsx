@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ImageTextEditorProps {
   onImageGenerated: (imageUrl: string) => void;
@@ -8,10 +9,12 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const t = useTranslations('editor');
 
   const handleGenerateImage = async () => {
     if (!keyword.trim()) {
-      setError('请输入关键词');
+      setError(t('textImageTip'));
       return;
     }
 
@@ -47,7 +50,7 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
           type="text"
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
-          placeholder="输入关键词生成图片"
+          placeholder={t('textImageTip')}
           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -58,7 +61,7 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
         className={`w-full px-4 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg
                    font-medium transition-all hover:from-blue-600 hover:to-blue-700
                    disabled:opacity-50 disabled:cursor-not-allowed`}>
-        {isLoading ? '生成中...' : '生成图片'}
+        {isLoading ? t('textImageBtn2') : t('textImageBtn')}
       </button>
     </div>
   );

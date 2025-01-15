@@ -13,6 +13,9 @@ import ErrorBoundary from './ErrorBoundary';
 
 import ImageTextEditor from './ImageTextEditor';
 
+import { useTranslations } from 'next-intl';
+
+
 const defaultSection: Section = {
   id: uuidv4(),
   title: '',
@@ -46,6 +49,8 @@ const GRADIENT_TEXT = `
 `;
 
 const XhsEditor = () => {
+  const t = useTranslations('editor');
+
   const [editorState, setEditorState] = useState<EditorState>({
     template: 'ai',
     title: '',
@@ -520,7 +525,7 @@ const XhsEditor = () => {
               throw new Error('Failed to create blob from image data');
             }
 
-            const file = new File([blob], `小红书图片_${Date.now()}.${format}`, { type: `image/${format}` });
+            const file = new File([blob], `xiaohongshu_${Date.now()}.${format}`, { type: `image/${format}` });
 
             if (navigator.share && navigator.canShare({ files: [file] })) {
               await navigator.share({
@@ -622,8 +627,8 @@ const XhsEditor = () => {
             {/* 主标题 - 优化布局和间距 */}
             <h1 className="flex flex-col items-center justify-center mb-4">
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">小红书图文生成器</span>
-                <span className={`text-xl sm:text-2xl font-bold ${GRADIENT_TEXT}`}>让创作自由起飞</span>
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">{t('title1')}</span>
+                <span className={`text-xl sm:text-2xl font-bold ${GRADIENT_TEXT}`}>{t('title2')}</span>
               </div>
             </h1>
 
@@ -631,19 +636,19 @@ const XhsEditor = () => {
             <div className="flex items-center justify-center">
               <div className="flex items-center flex-wrap justify-center gap-3">
                 <div className="flex items-center">
-                  <span className="font-medium text-gray-900">AI智能创作</span>
+                  <span className="font-medium text-gray-900">{t('subtitle1')}</span>
                   <svg className="w-4 h-4 text-rose-500 ml-1.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                   </svg>
                 </div>
                 <div className="flex items-center">
-                  <span className="font-medium text-gray-900">一键排版</span>
+                  <span className="font-medium text-gray-900">{t('subtitle2')}</span>
                   <svg className="w-4 h-4 text-rose-500 ml-1.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                   </svg>
                 </div>
                 <div className="flex items-center">
-                  <span className="font-medium text-gray-900">即时导出</span>
+                  <span className="font-medium text-gray-900">{t('subtitle3')}</span>
                   <svg className="w-4 h-4 text-rose-500 ml-1.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                   </svg>
@@ -667,7 +672,7 @@ const XhsEditor = () => {
                           : 'text-gray-600 hover:text-gray-900'
                       }`}
                       onClick={() => handleTemplateChange('ai')}>
-                      灵感创作
+                      {t('tab1')}
                     </button>
                     <button
                       className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
@@ -676,7 +681,7 @@ const XhsEditor = () => {
                           : 'text-gray-600 hover:text-gray-900'
                       }`}
                       onClick={() => handleTemplateChange('hot_post')}>
-                      爆款仿写
+                      {t('tab2')}
                     </button>
                     <button
                       className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
@@ -685,7 +690,7 @@ const XhsEditor = () => {
                           : 'text-gray-600 hover:text-gray-900'
                       }`}
                       onClick={() => handleTemplateChange('image_text')}>
-                      文字配图
+                      {t('tab3')}
                     </button>
                   </div>
                 </div>
@@ -743,53 +748,43 @@ const XhsEditor = () => {
                         {
                           from: '#fbc2eb',
                           to: '#a6c1ee',
-                          name: '浪漫粉',
                         },
                         {
                           from: '#84fab0',
                           to: '#8fd3f4',
-                          name: '清新绿',
                         },
                         {
                           from: '#a1c4fd',
                           to: '#c2e9fb',
-                          name: '天空蓝',
                         },
                         {
                           from: '#ffecd2',
                           to: '#fcb69f',
-                          name: '暖阳橙',
                         },
                         {
                           from: '#ff9a9e',
                           to: '#fecfef',
-                          name: '樱花粉',
                         },
                         {
                           from: '#96fbc4',
                           to: '#f9f586',
-                          name: '森林绿',
                         },
 
                         {
                           from: '#FFD1FF',
                           to: '#FAD0C4',
-                          name: '蜜桃粉', // 柔和的粉色渐变
                         },
                         {
                           from: '#A8EDEA',
                           to: '#FED6E3',
-                          name: '薄荷粉', // 清新的薄荷绿到粉色
                         },
                         {
                           from: '#B2EBF2',
                           to: '#80DEEA',
-                          name: '浅碧蓝', // 清透的浅蓝色
                         },
                         {
                           from: '#DCEDC8',
                           to: '#F1F8E9',
-                          name: '抹茶拿铁', // 淡淡的抹茶绿
                         },
                       ].map(({ from, to, name }) => (
                         <button
@@ -813,10 +808,11 @@ const XhsEditor = () => {
               <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-4">
                 {['ai', 'hot_post'].includes(editorState.template) && (
                   <input
+                    id="topicInput"
                     type="text"
                     value={editorState.title}
                     onChange={e => handleTitleChange(e.target.value)}
-                    placeholder="输入标题"
+                    placeholder={t('inputKeyword')}
                     className="w-full px-4 py-2.5 bg-white rounded-lg border border-gray-200
                            focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all
                            text-lg mb-4"
@@ -869,7 +865,7 @@ const XhsEditor = () => {
                                flex flex-col">
                   {/* 预览标题 */}
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-600">预览效果</span>
+                    <span className="text-sm font-medium text-gray-600">{t('previewTitle')}</span>
                     <div className="flex gap-1">
                       <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
@@ -911,7 +907,7 @@ const XhsEditor = () => {
                                   <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z" />
                                 </svg>
                               </div>
-                              <p className="text-gray-500 text-sm">请输入关键词生成图片</p>
+                              <p className="text-gray-500 text-sm">{t('textImageTip')}</p>
                             </div>
                           )}
                         </div>
@@ -939,17 +935,17 @@ const XhsEditor = () => {
                         onClick={async () => {
                           const content = editorState.sections[0]?.content || '';
                           if (!content.trim()) {
-                            showToast('暂无内容可复制', 'error');
+                            showToast(t('copyTextTip'), 'error');
                             return;
                           }
 
                           try {
                             const plainText = convertMarkdownToPlainText(content);
                             await navigator.clipboard.writeText(plainText);
-                            showToast('已复制到剪贴板');
+                            showToast(t('copyTextSuccess'));
                           } catch (err) {
                             console.error('Failed to copy:', err);
-                            showToast('复制失败，请重试', 'error');
+                            showToast(t('copyTextError'));
                           }
                         }}
                         className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100
@@ -965,7 +961,7 @@ const XhsEditor = () => {
                           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                         </svg>
-                        <span>复制文本</span>
+                        <span>{t('copyText')}</span>
                       </button>
                     )}
 
@@ -975,7 +971,7 @@ const XhsEditor = () => {
                         if (editorState.template === 'image_text') {
                           // 文字配图模式
                           if (!editorState.sections[0]?.imageUrl) {
-                            showToast('暂无图片可下载', 'error');
+                            showToast(t('downloadCardTip'), 'error');
                             return;
                           }
                           handleImageDownload('png');
@@ -983,7 +979,7 @@ const XhsEditor = () => {
                           // 其他模式
                           const content = editorState.sections[0]?.content || '';
                           if (!content.trim()) {
-                            showToast('暂无内容可下载', 'error');
+                            showToast(t('downloadCardTip2'), 'error');
                             return;
                           }
                           handleDownload('png');
@@ -1003,7 +999,7 @@ const XhsEditor = () => {
                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                         />
                       </svg>
-                      <span>下载图片</span>
+                      <span>{t('downloadCard')}</span>
                     </button>
                   </div>
                 </div>

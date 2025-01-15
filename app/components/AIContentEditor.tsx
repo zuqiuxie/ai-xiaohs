@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { showToast, ToastType } from '@/app/utils/toast';
-
+import { useTranslations } from 'next-intl';
 interface AIContentEditorProps {
   title: string;
   onContentGenerated: (content: string) => void;
@@ -12,13 +12,13 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
   const [error, setError] = useState<string | null>(null);
   const { trackEvent } = useAnalytics();
 
+  const t = useTranslations('editor');
+
   const generateContent = async () => {
-    const startTime = Date.now();
-    // console.log('[Client] Generation started:', new Date().toISOString());
 
     // 输入验证
     if (!title.trim()) {
-      showToast('请先输入标题，AI将帮你扩写成爆款笔记', 'info');
+      showToast(t('generatingTip2'), 'info');
       // 让输入框获得焦点
       const titleInput = document.querySelector('input[type="text"][placeholder="输入标题"]') as HTMLInputElement;
       titleInput?.focus();
@@ -166,8 +166,8 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
               </div>
             </div>
             <div className="flex-1 text-sm text-gray-600 leading-relaxed">
-              <p>AI将根据你的标题创作一篇吸引眼球、互动性强的小红书笔记。</p>
-              <p className="mt-1 text-gray-500">建议输入具体的主题，比如「10分钟快手早餐」「遛娃遇到的神器」等。</p>
+              <p>{t('topicTip')}</p>
+              <p className="mt-1 text-gray-500">{t('topicTip2')}</p>
             </div>
           </div>
 
@@ -198,14 +198,14 @@ export default function AIContentEditor({ title, onContentGenerated }: AIContent
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                <span>内容生成中...</span>
+                <span>{t('generatingTip')}</span>
               </>
             ) : (
               <>
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <span>AI一键创作</span>
+                <span>{t('topicGeneratBtn')}</span>
               </>
             )}
           </button>

@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import { forwardRef, useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ComponentProps {
   children?: React.ReactNode;
@@ -19,6 +20,7 @@ interface MarkdownCardProps {
 
 const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
   ({ content, font, fontSize, backgroundColor, onContentChange, onTitleChange, onDownload }, ref) => {
+    const t = useTranslations('editor');
     const [isEditing, setIsEditing] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -81,7 +83,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
               <svg className="w-3.5 h-3.5 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span className="text-xs text-green-600 font-medium">完成</span>
+              <span className="text-xs text-green-600 font-medium">{t('previewSave')}</span>
             </>
           ) : (
             <>
@@ -93,7 +95,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                   d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                 />
               </svg>
-              <span className="text-xs text-blue-600 font-medium">编辑</span>
+              <span className="text-xs text-blue-600 font-medium">{t('previewEdit')}</span>
             </>
           )}
         </button>
@@ -143,10 +145,10 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                     />
                   </svg>
                   <div className="text-center space-y-3">
-                    <p className="text-xl font-semibold text-gray-800">等待生成内容</p>
+                    <p className="text-xl font-semibold text-gray-800">{t('previewWaiting')}</p>
                     <div className="bg-blue-50 rounded-lg p-4 shadow-sm max-w-xs mx-auto">
-                      <p className="text-sm text-blue-700 mb-2">👈 请在左侧输入配置信息</p>
-                      <p className="text-sm text-blue-700 font-medium">然后点击按钮生成内容</p>
+                      <p className="text-sm text-blue-700 mb-2">👈 {t('previewGenerateTip1')}</p>
+                      <p className="text-sm text-blue-700 font-medium">{t('previewGenerateTip2')}</p>
                     </div>
                   </div>
                 </div>
@@ -158,7 +160,7 @@ const MarkdownCard = forwardRef<HTMLDivElement, MarkdownCardProps>(
                       onChange={e => onContentChange?.(e.target.value)}
                       className="w-full px-3 py-2 bg-white/50 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all min-h-[432px] resize-none"
                       style={{ fontSize: contentSize, lineHeight: '1.6' }}
-                      placeholder="输入内容..."
+                      placeholder={t('inputContent')}
                     />
                   ) : (
                     <ReactMarkdown

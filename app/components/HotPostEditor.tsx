@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { showToast, ToastType } from '@/app/utils/toast';
+import { useTranslations } from 'next-intl';
+
 
 interface HotPostEditorProps {
   onContentGenerated: (content: string) => void;
@@ -15,34 +17,40 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [contentStyle, setContentStyle] = useState('轻松活泼');
 
-  const { trackEvent } = useAnalytics();
+  const t = useTranslations('editor');
+
+  const styleList = [
+    t('hotContentStyleList1'),
+    t('hotContentStyleList2'),
+    t('hotContentStyleList3')
+  ];
 
   const handleGenerate = async () => {
-    const titleInput = document.querySelector('input[type="text"][placeholder="输入标题"]') as HTMLInputElement;
+    const titleInput = document.getElementById('topicInput') as HTMLInputElement;
     const title = titleInput?.value || '';
 
     if (!title) {
-      showToast('请先输入标题', 'warning');
+      showToast(t('hotPostTip1'), 'warning');
       return;
     }
 
     if (!originalText.trim()) {
-      showToast('请先粘贴要参考的爆款笔记内容', 'warning');
+      showToast(t('hotPostTip2'), 'warning');
       return;
     }
 
     if (originalText.length < 50) {
-      showToast('建议提供更详细的参考内容，以获得更好的生成效果', 'warning');
+      showToast(t('hotPostTip3'), 'warning');
       return;
     }
 
     if (!keywords) {
-      showToast('请输入核心关键词', 'warning');
+      showToast(t('hotPostTip4'), 'warning');
       return;
     }
 
     if (keywords && keywords.split(',').length > 3) {
-      showToast('关键词不要超过3个，以确保内容聚焦', 'warning');
+      showToast(t('hotPostTip5'), 'warning');
       return;
     }
 
@@ -67,7 +75,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || '生成失败');
+        throw new Error(errorData.error || 'generate failed');
       }
 
       const reader = response.body?.getReader();
@@ -113,8 +121,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
         reader.releaseLock();
       }
     } catch (error) {
-      console.error('生成失败:', error);
-      showToast(error instanceof Error ? error.message : '生成失败，请重试', 'error');
+      showToast(error instanceof Error ? error.message : 'generate failed, please try again', 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -125,7 +132,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
       <div className="flex-1 grid grid-cols-2 gap-6 mb-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-gray-700">原文参考</label>
+            <label className="text-sm font-medium text-gray-700">{t('hotOriginTitle')}</label>
             <span className={`text-xs ${originalText.length > 2000 ? 'text-red-500' : 'text-gray-400'}`}>
               {originalText.length} / 2000
             </span>
@@ -133,7 +140,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
           <textarea
             value={originalText}
             onChange={e => setOriginalText(e.target.value)}
-            placeholder="粘贴你想参考的爆款笔记内容..."
+            placeholder={t('hotOriginTitleTip')}
             className="w-full h-[calc(100%-32px)] px-4 py-3 bg-white/80 rounded-xl
                      border border-gray-200/80 focus:outline-none focus:ring-2
                      focus:ring-blue-500/20 transition-all resize-none
@@ -144,14 +151,16 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">核心关键词</label>
-              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">用逗号分隔，最多3个</span>
+              <label className="text-sm font-medium text-gray-700">{t('hotKeywords')}</label>
+              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                {t('hotKeywordsTip2')}
+              </span>
             </div>
             <input
               type="text"
               value={keywords}
               onChange={e => setKeywords(e.target.value)}
-              placeholder="例如：减肥食谱, 低卡, 健康"
+              placeholder={t('hotKeywordsTip')}
               className="w-full px-4 py-2.5 bg-white/80 rounded-xl border
                        border-gray-200/80 focus:outline-none focus:ring-2
                        focus:ring-blue-500/20 transition-all text-sm
@@ -160,9 +169,9 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">内容风格</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('hotContentStyle')}</label>
             <div className="grid grid-cols-3 gap-2">
-              {['轻松活泼', '专业严谨', '感性温暖'].map(style => (
+              {styleList.map(style => (
                 <button
                   key={style}
                   onClick={() => setContentStyle(style)}
@@ -180,13 +189,15 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">补充信息</label>
-              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">选填</span>
+              <label className="text-sm font-medium text-gray-700">{t('hotAddInfo')}</label>
+              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                {t('hotAddInfoTip2')}
+              </span>
             </div>
             <textarea
               value={additionalInfo}
               onChange={e => setAdditionalInfo(e.target.value)}
-              placeholder="添加独特观点、个人经验或数据..."
+              placeholder={t('hotAddInfoTip')}
               className="w-full h-[120px] px-4 py-3 bg-white/80 rounded-xl
                        border border-gray-200/80 focus:outline-none focus:ring-2
                        focus:ring-blue-500/20 transition-all resize-none
@@ -225,14 +236,14 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <span>内容生成中...</span>
+              <span>{t('generatingTip')}</span>
             </>
           ) : (
             <>
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>开始生成</span>
+              <span>{t('hotGenerateBtn')}</span>
             </>
           )}
         </button>

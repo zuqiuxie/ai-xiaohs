@@ -3,7 +3,7 @@
 import { CheckIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 import Image from 'next/image';
-
+import { useTranslations } from 'next-intl';
 const tiers = [
   {
     name: '体验版',
@@ -30,6 +30,7 @@ const tiers = [
 
 export default function PricingSection() {
   const [showPayModal, setShowPayModal] = useState(false);
+  const t = useTranslations('editor');
 
   return (
     <div id="pricing" className="relative px-4 py-16">
