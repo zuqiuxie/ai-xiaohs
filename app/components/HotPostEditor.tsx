@@ -211,7 +211,7 @@ const HotPostEditor = ({ onContentGenerated }: HotPostEditorProps) => {
         <button
           onClick={handleGenerate}
           disabled={isGenerating}
-          className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500
+          className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500
                    hover:from-blue-600 hover:to-purple-600 text-white rounded-xl
                    transition-all duration-200 flex items-center justify-center gap-2
                    disabled:cursor-not-allowed disabled:opacity-50 font-medium text-sm

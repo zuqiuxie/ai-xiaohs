@@ -17,21 +17,21 @@ export async function POST(req: Request) {
   try {
     const { originalText, title, keywords, style, additionalInfo } = await req.json()
 
-    if (!originalText || !title || !keywords) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required parameters' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      )
-    }
+    // if (!originalText || !title || !keywords) {
+    //   return new Response(
+    //     JSON.stringify({ error: 'Missing required parameters' }),
+    //     {
+    //       status: 400,
+    //       headers: { 'Content-Type': 'application/json' }
+    //     }
+    //   )
+    // }
 
     // 保持原有的消息结构
     const messages = [
       {
         role: 'system',
-        content: `你是一位擅长模仿和创新的小红书内容创作专家。你的任务是基于用户提供的爆款笔记，结合用户指定的主题和风格，创作一篇全新的笔记。总字数严格控制在200字以内。
+        content: `你是一位擅长模仿和创新的小红书内容创作专家。你的任务是基于用户提供的爆款笔记，结合用户指定的主题和风格，创作一篇全新的笔记。总字数严格控制在300字以内。
 
 创作原则：
 - 保留爆款笔记的核心吸引力要素和写作技巧
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 - 确保内容原创性和真实感
 
 创作规范：
-1. 标题（16字内）：
+1. 标题（20字内）：
    - 必须体现用户的主题和关键词
    - 1-2个emoji，放在开头或结尾
    - 运用以下标题技巧：
@@ -80,7 +80,7 @@ ${additionalInfo ? `补充信息：${additionalInfo}` : ''}
 1. 直接输出内容，不要包含任何标记文字
 2. 突出核心关键词
 3. 内容精炼有价值
-5. 总字数限200字内`,
+5. 总字数限300字内`,
       },
     ]
 

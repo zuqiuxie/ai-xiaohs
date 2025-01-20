@@ -9,7 +9,7 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const t = useTranslations('editor');
 
   const handleGenerateImage = async () => {
@@ -58,9 +58,11 @@ export default function ImageTextEditor({ onImageGenerated }: ImageTextEditorPro
       <button
         onClick={handleGenerateImage}
         disabled={isLoading}
-        className={`w-full px-4 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg
-                   font-medium transition-all hover:from-blue-600 hover:to-blue-700
-                   disabled:opacity-50 disabled:cursor-not-allowed`}>
+        className={`w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500
+                     hover:from-blue-600 hover:to-purple-600 text-white rounded-xl
+                     transition-all duration-200 flex items-center justify-center
+                     gap-2 shadow-sm hover:shadow-md disabled:opacity-50
+                     disabled:cursor-not-allowed font-medium`}>
         {isLoading ? t('textImageBtn2') : t('textImageBtn')}
       </button>
     </div>
