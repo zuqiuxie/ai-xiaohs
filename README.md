@@ -1,6 +1,7 @@
 # 小红书图文生成器
 
-demo网站：ai-xiaohs.vercel.app
+demo网站：https://ai-xiaohs.vercel.app
+
 demo网站: https://www.xhscard.top/
 
 
