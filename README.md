@@ -1,5 +1,9 @@
 # 小红书图文生成器
 
+demo网站：ai-xiaohs.vercel.app
+demo网站: https://www.xhscard.top/
+
+
 一个基于 AI 技术的小红书文案创作助手，帮助创作者快速生成吸引人的内容。
 
 ## ✨ 功能特点
